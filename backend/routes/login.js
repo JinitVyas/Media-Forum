@@ -7,16 +7,20 @@ const router = express.Router();
 // Login Route
 router.post('/', async (req, res) => {
   const { email, password } = req.body;
-
+  // console.log(req.body);
+  
   try {
     // Check if the user exists
     const user = await User.findOne({ email });
+    // console.log(user);
     if (!user) {
       return res.status(400).json({ message: 'Invalid email or password' });
     }
-
+    console.log("lund");
     // Compare the provided password with the stored hashed password
     const isMatch = await bcrypt.compare(password, user.password);
+    console.log("Bada lund");
+
     if (!isMatch) {
       return res.status(400).json({ message: 'Invalid email or password' });
     }

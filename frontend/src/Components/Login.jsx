@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import '../app.css';
 
 const Login = ({ prop }) => {
-  const [username, setUsername] = useState(''); // State for username
+  const [email, setEmail] = useState(''); // Changed state from username to email
   const [password, setPassword] = useState(''); // State for password
   const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
   const [error, setError] = useState(''); // State to display login errors
@@ -26,15 +26,17 @@ const Login = ({ prop }) => {
 
     try {
       const response = await fetch('http://localhost:3001/api/login', {
+        
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          username,
+          email, // Sending email instead of username
           password,
         }),
       });
+      // console.log(email," ",password);
 
       const data = await response.json();
 
@@ -43,7 +45,7 @@ const Login = ({ prop }) => {
         navigate('/accountPage'); // Navigate to My Account page
       } else {
         // Display error message from backend
-        setError(data.message || 'Invalid username or password.');
+        setError(data.message || 'Invalid email or password.');
       }
     } catch (error) {
       // Handle network errors or other issues
@@ -60,15 +62,15 @@ const Login = ({ prop }) => {
           LOGIN
         </h1>
 
-        {/* Username Input */}
+        {/* Email Input */}
         <div className="flex items-center border border-gray-300 rounded mb-4 p-2">
           <FaUser className="text-gray-500 mr-3" />
           <input
-            type="text"
-            placeholder="Enter Username"
+            type="email" // Changed input type to email
+            placeholder="Enter Email" // Updated placeholder to Enter Email
             className="w-full outline-none"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            value={email} // Set value to email
+            onChange={(e) => setEmail(e.target.value)} // Update state for email
             disabled={loading} // Disable inputs while loading
           />
         </div>

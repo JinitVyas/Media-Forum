@@ -7,7 +7,6 @@ import Footer from '../Components/Footer';
 import GoToTopButton from '../Components/GoToTopButton';
 import Select from 'react-select';
 
-
 const RegisterPage = () => {
     const {
         register,

@@ -14,6 +14,13 @@ const userSchema = new mongoose.Schema({
   sponsorId: { type: String, required: true },
   vigilanceOfficer: { type: String, required: true },
   accountUsername: { type: String, required: true },
+  password: { type: String, required: true },
+  role: { 
+    type: String, 
+    enum: ['user', 'admin'], 
+    default: 'user', // Default value is 'user'
+    required: true 
+  },
 });
 
 // Create a User model
