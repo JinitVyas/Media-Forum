@@ -5,8 +5,7 @@ import IntroBanner from '../Components/IntroBanner';
 import Navbar from '../Components/Navbar';
 import Footer from '../Components/Footer';
 import GoToTopButton from '../Components/GoToTopButton';
-import Select from 'react-select'; // Import react-select
-// import stateCityData from './'; // Import the JSON file
+import Select from 'react-select';
 
 
 const RegisterPage = () => {
