@@ -7,3 +7,5 @@
 .env.development
 .env.production
 >>>>>>> 8e717c477d47f13172cc36f104d5c33e3e03d969
+
+node_modules
