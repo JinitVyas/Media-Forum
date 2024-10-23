@@ -36,7 +36,6 @@ const Login = ({ prop }) => {
           password,
         }),
       });
-      // console.log(email," ",password);
 
       const data = await response.json();
 

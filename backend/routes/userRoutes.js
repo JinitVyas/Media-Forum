@@ -1,3 +1,4 @@
+// userRoutes.js
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const User = require('../models/User'); // Assuming you have a User model
@@ -5,7 +6,6 @@ const router = express.Router();
 
 // Login route with session management
 router.post('/login', async (req, res) => {
-  console.log(req.body);
   const { email, password } = req.body;
 
   try {
@@ -43,6 +43,7 @@ router.post('/logout', (req, res) => {
     res.status(200).json({ message: 'Logout successful' });
   });
 });
+
 
 // Protected route (requires login)
 router.get('/profile', (req, res) => {
