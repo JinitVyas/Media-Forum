@@ -1,11 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import IntroBanner from '../Components/IntroBanner';
 import Navbar from '../Components/Navbar';
 import Footer from '../Components/Footer';
 import GoToTopButton from '../Components/GoToTopButton';
-
 
 const RegisterPage = () => {
     const {
@@ -19,9 +18,21 @@ const RegisterPage = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [submitMessage, setSubmitMessage] = useState('');
+    const [aadharFront, setAadharFront] = useState(null);
+    const [aadharBack, setAadharBack] = useState(null);
+    const [pan, setPan] = useState(null);
+    const [userImage, setUserImage] = useState(null);
+    const [paymentScreenshot, setPaymentScreenshot] = useState(null);
+    const [uploadProgress, setUploadProgress] = useState({
+        aadharFront: 0,
+        aadharBack: 0,
+        pan: 0,
+        userImage: 0,
+        paymentScreenshot: 0,
+    });
     const navigate = useNavigate();
 
-  
+    // Function to check if the user is 18 years or older
     const isAdult = (dob) => {
         const dobDate = new Date(dob);
         const today = new Date();
@@ -32,42 +43,73 @@ const RegisterPage = () => {
             : age >= 18;
     };
 
+    // Function to handle file uploads
+    const handleFileChange = (field) => (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            if (field === 'aadharFront') {
+                setAadharFront(file);
+            } else if (field === 'aadharBack') {
+                setAadharBack(file);
+            } else if (field === 'pan') {
+                setPan(file);
+            } else if (field === 'userImage') {
+                setUserImage(file);
+            } else if (field === 'paymentScreenshot') {
+                setPaymentScreenshot(file);
+            }
+            // Simulate upload progress for demo purposes
+            const uploadInterval = setInterval(() => {
+                setUploadProgress((prev) => {
+                    const currentProgress = prev[field] || 0;
+                    if (currentProgress >= 100) {
+                        clearInterval(uploadInterval);
+                        return { ...prev, [field]: 100 }; // Ensure it caps at 100%
+                    }
+                    return { ...prev, [field]: currentProgress + 10 };
+                });
+            }, 100);
+        }
+    };
+
+    // Function to send form data to the backend
     async function onSubmit(data) {
         setSubmitMessage('');
         try {
-            const response = await fetch('http://localhost:3001/api/register', {
+            const formData = new FormData();
+            formData.append('firstName', data.firstName);
+            formData.append('lastName', data.lastName);
+            formData.append('dob', data.dob);
+            formData.append('phoneNumber', data.phoneNumber);
+            formData.append('email', data.email);
+            formData.append('streetAddress', data.streetAddress);
+            formData.append('city', data.city);
+            formData.append('state', data.state);
+            formData.append('pincode', data.pincode);
+            formData.append('nomineeName', data.nomineeName);
+            formData.append('sponsorID', data.sponsorID);
+            formData.append('username', data.username);
+            formData.append('password', data.password);
+            formData.append('aadharCardFront', aadharFront);
+            formData.append('aadharCardBack', aadharBack);
+            formData.append('panCard', pan);
+            formData.append('userImage', userImage);
+            formData.append('paymentScreenshot', paymentScreenshot);
+
+            const response = await fetch('http://localhost:3001/api/users', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    firstName: data.firstName,
-                    lastName: data.lastName,
-                    streetAddress: data.streetAddress,
-                    town: data.city,
-                    state: data.state,
-                    pincode: data.pincode,
-                    phone: data.phoneNumber,
-                    email: data.email,
-                    nomineeName: data.nomineeName,
-                    sponsorId: data.sponsorID,
-                    vigilanceOfficer: 'Officer Name',
-                    accountUsername: data.username,
-                    password: data.password,
-                }),
+                body: formData,
             });
 
             if (response.ok) {
                 setSubmitMessage('Registration successful!');
-                reset(); // Reset form fields
-                navigate('/home'); // Redirect after successful registration
+                reset();
+                navigate('/home');
             } else {
                 const errorData = await response.json();
-                console.log('Error data:', errorData); // Log the error response for debugging
                 setSubmitMessage(`Registration failed: ${errorData.message}`);
             }
         } catch (error) {
-            console.error('Error:', error);
             setSubmitMessage('An error occurred. Please try again.');
         }
     }
@@ -165,7 +207,7 @@ const RegisterPage = () => {
 
                         {/* Street Address */}
                         <div>
-                            <label className="block mb-1 font-semibold text-start">Street Address <span className='text-red-500'>*</span></label>
+                            <label className="block mb-1 font-semibold text-start">Street Address<span className='text-red-500'>*</span></label>
                             <input
                                 type="text"
                                 {...register('streetAddress', { required: 'Street Address is required' })}
@@ -331,6 +373,142 @@ const RegisterPage = () => {
                                 {showConfirmPassword ? 'Hide' : 'Show'}
                             </span>
                             {errors.confirmPassword && <p className="text-red-500">{errors.confirmPassword.message}</p>}
+                        </div>
+
+                        {/* Aadhar Front Upload */}
+                        <div>
+                            <label className="block mb-1 font-semibold text-start">Aadhar Card (Front) <span className='text-red-500'>*</span></label>
+                            <input
+                                type="file"
+                                accept=".jpg, .jpeg, .png, .pdf"
+                                {...register('aadharFront', { required: 'Aadhar Front is required' })}
+                                onChange={handleFileChange('aadharFront')}
+                                className='border border-gray-300 focus:border-black w-full p-2'
+                            />
+                            <div className="mt-2">
+                                {aadharFront && <span>{aadharFront.name}</span>}
+                                {errors.aadharFront && <p className="text-red-500">{errors.aadharFront.message}</p>}
+                                {uploadProgress.aadharFront > 0 && (
+                                    <div>
+                                        <div className="relative w-full bg-gray-300 rounded">
+                                            <div className="bg-blue-600 h-2 rounded" style={{ width: `${uploadProgress.aadharFront}%` }}></div>
+                                        </div>
+                                        <p className="text-sm text-gray-600">{uploadProgress.aadharFront}% uploaded</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Aadhar Back Upload */}
+                        <div>
+                            <label className="block mb-1 font-semibold text-start">Aadhar Card (Back) <span className='text-red-500'>*</span></label>
+                            <input
+                                type="file"
+                                accept=".jpg, .jpeg, .png, .pdf"
+                                {...register('aadharBack', { required: 'Aadhar Back is required' })}
+                                onChange={handleFileChange('aadharBack')}
+                                className='border border-gray-300 focus:border-black w-full p-2'
+                            />
+                            <div className="mt-2">
+                                {aadharBack && <span>{aadharBack.name}</span>}
+                                {errors.aadharBack && <p className="text-red-500">{errors.aadharBack.message}</p>}
+                                {uploadProgress.aadharBack > 0 && (
+                                    <div>
+                                        <div className="relative w-full bg-gray-300 rounded">
+                                            <div className="bg-blue-600 h-2 rounded" style={{ width: `${uploadProgress.aadharBack}%` }}></div>
+                                        </div>
+                                        <p className="text-sm text-gray-600">{uploadProgress.aadharBack}% uploaded</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* PAN Upload */}
+                        <div>
+                            <label className="block mb-1 font-semibold text-start">PAN Card <span className='text-red-500'>*</span></label>
+                            <input
+                                type="file"
+                                accept=".jpg, .jpeg, .png, .pdf"
+                                {...register('panCard', { required: 'PAN is required' })}
+                                onChange={handleFileChange('pan')}
+                                className='border border-gray-300 focus:border-black w-full p-2'
+                            />
+                            <div className="mt-2">
+                                {pan && <span>{pan.name}</span>}
+                                {errors.panCard && <p className="text-red-500">{errors.panCard.message}</p>}
+                                {uploadProgress.pan > 0 && (
+                                    <div>
+                                        <div className="relative w-full bg-gray-300 rounded">
+                                            <div className="bg-blue-600 h-2 rounded" style={{ width: `${uploadProgress.pan}%` }}></div>
+                                        </div>
+                                        <p className="text-sm text-gray-600">{uploadProgress.pan}% uploaded</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* User Image Upload */}
+                        <div>
+                            <label className="block mb-1 font-semibold text-start">User Image <span className='text-red-500'>*</span></label>
+                            <input
+                                type="file"
+                                accept=".jpg,.jpeg,.png"
+                                {...register('userImage', { required: 'User Image is required' })}
+                                onChange={handleFileChange('userImage')}
+                                className="w-full border border-gray-300 p-2 focus:outline-none focus:border-black"
+                            />
+                            <div className="mt-2">
+                                {userImage && <span>{userImage.name}</span>}
+                                {errors.userImage && <p className="text-red-500">{errors.userImage.message}</p>}
+                                {uploadProgress.userImage > 0 && (
+                                    <div>
+                                        <div className="relative w-full bg-gray-300 rounded">
+                                            <div className="bg-blue-600 h-2 rounded" style={{ width: `${uploadProgress.userImage}%` }}></div>
+                                        </div>
+                                        <p className="text-sm text-gray-600">{uploadProgress.userImage}% uploaded</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* QR Code For Payment */}
+                        <div className="mb-6 text-center">
+                            {/* Label or Heading */}
+                            <h3 className="text-xl font-bold mb-2">Scan the QR Code for Payment</h3>
+
+                            {/* QR Code Image */}
+                            <img
+                                src="public/Photos/QR.jpg" // Replace with the actual path of your QR code image in the public folder
+                                alt="QR Code for Payment"
+                                className="mx-auto mb-4 w-48 h-48"
+                            />
+
+                            {/* Optional additional info */}
+                            <p className="text-gray-600">Please scan the QR code above to complete your payment before proceeding with registration.</p>
+                        </div>
+
+                        {/* Payment Screenshot Upload */}
+                        <div>
+                            <label className="block mb-1 font-semibold text-start">Payment Screenshot <span className='text-red-500'>*</span></label>
+                            <input
+                                type="file"
+                                accept=".pdf,.jpg,.jpeg,.png"
+                                {...register('paymentScreenshot', { required: 'Payment Screenshot is required' })}
+                                onChange={handleFileChange('paymentScreenshot')}
+                                className="w-full border border-gray-300 p-2 focus:outline-none focus:border-black"
+                            />
+                            <div className="mt-2">
+                                {paymentScreenshot && <span>{paymentScreenshot.name}</span>}
+                                {errors.paymentScreenshot && <p className="text-red-500">{errors.paymentScreenshot.message}</p>}
+                                {uploadProgress.paymentScreenshot > 0 && (
+                                    <div>
+                                        <div className="relative w-full bg-gray-300 rounded">
+                                            <div className="bg-blue-600 h-2 rounded" style={{ width: `${uploadProgress.paymentScreenshot}%` }}></div>
+                                        </div>
+                                        <p className="text-sm text-gray-600">{uploadProgress.paymentScreenshot}% uploaded</p>
+                                    </div>
+                                )}
+                            </div>
                         </div>
 
                         {/* Submit and Reset buttons */}

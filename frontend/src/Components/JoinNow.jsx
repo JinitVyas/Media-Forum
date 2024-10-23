@@ -8,7 +8,7 @@ const JoinNow = () => {
         <div className='w-1/2 flex flex-col items-center'>
           <div className='mb-4'>
             <img 
-              src="/Photos/Logo.png" 
+              src="/Photos/Logo.jpg" 
               alt="Logo Image" 
               className="w-64 h-auto"
             />

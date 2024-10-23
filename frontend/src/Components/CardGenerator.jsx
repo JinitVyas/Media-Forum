@@ -31,44 +31,60 @@ const CardGenerator = () => {
         fetchUserProfile();
     }, []);
 
-    const downloadPDF = () => {
+    const downloadPDF = async () => {
         const capture = document.getElementById('IDCARD');
-
-        // Increase the scale and height for better resolution
-        html2canvas(capture, {
-            scale: 3, // Higher scale for higher resolution
+    
+        // Check if the capture element is valid
+        if (!capture) {
+            console.error('Capture element not found');
+            return;
+        }
+    
+        // Use html2canvas to capture the ID card
+        const canvas = await html2canvas(capture, {
+            scale: 2, // Increase scale for better quality
+            scrollX: 0,
+            scrollY: 0,
             useCORS: true,
             allowTaint: true,
             logging: true,
-        }).then((canvas) => {
-            const imgData = canvas.toDataURL('image/png');
-            const doc = new jsPDF('p', 'mm', 'a4');
-
-            // Get page dimensions
-            const pageWidth = doc.internal.pageSize.getWidth();
-            const pageHeight = doc.internal.pageSize.getHeight();
-
-            // Calculate height to maintain aspect ratio
-            const imgWidth = pageWidth;
-            const imgHeight = (canvas.height * pageWidth) / canvas.width;
-
-            // Ensure the entire image fits on the page
-            if (imgHeight > pageHeight) {
-                doc.addImage(imgData, 'PNG', 0, 0, pageWidth, pageHeight);
-            } else {
-                doc.addImage(imgData, 'PNG', 0, 0, pageWidth, imgHeight);
-            }
-
-            doc.save('Card.pdf');
         });
+    
+        const imgData = canvas.toDataURL('image/png');
+        const doc = new jsPDF('p', 'mm', 'a4');
+    
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+    
+        // Get the image width and height based on page width (for scaling)
+        const imgWidth = pageWidth;
+        const imgHeight = (canvas.height * pageWidth) / canvas.width;
+    
+        // Set a top margin (adjust as needed)
+        const topMargin = 10; // 10 mm space from the top
+    
+        // Ensure image fits on the page
+        if (imgHeight > pageHeight - topMargin) {
+            // If the image is taller than the page (considering the margin), fill the page from the top
+            doc.addImage(imgData, 'PNG', 0, topMargin, pageWidth, pageHeight - topMargin);
+        } else {
+            // Otherwise, place the image at the top with margin
+            doc.addImage(imgData, 'PNG', 0, topMargin, imgWidth, imgHeight);
+        }
+    
+        // Save the PDF
+        doc.save('Card.pdf');
     };
+    
+    
+    
 
     return (
         <div>
             <div id='IDCARD' className='w-full flex justify-center gap-10'>
                 <div className="flex flex-col items-center">
                     {/* Front Side */}
-                    <div className="border-[1px] border-gray-600 w-[420px] h-[265px] rounded-lg shadow-xl bg-white relative overflow-hidden">
+                    <div className="border-[1px] border-gray-600 w-[440px] h-[280px] rounded-lg shadow-xl bg-white relative overflow-hidden">
                         {/* Header */}
                         <div className="flex items-center">
                             <img
@@ -131,27 +147,33 @@ const CardGenerator = () => {
 
                         {/* Footer */}
                         <div>
-                            <p className='mt-2 bg-blue-700 text-white text-center text-[12px] font-bold'>सबका साथ, सबका विकास</p>
-                            <hr /><hr /><hr />
-                            <div className='bg-red-600 pb-2'>
-                                <p className=' text-white text-center text-[13px] font-medium tracking-wider'>www.digitalindiaeducation.co.in</p>
-                                <p className=' text-white text-center text-[13px] font-medium tracking-wider'>REGISTERED UNDER GOVERNMENT OF INDIA</p>
+                            <p className='mt-2 pb-2 bg-blue-700 text-white text-center text-[12px] font-bold m-0 p-0'>
+                                सबका साथ, सबका विकास
+                            </p>
+                            <div className='bg-red-600 pb-4 pt-0'>
+                                <p className='text-white text-center text-[13px] font-medium tracking-wider m-0 p-0'>
+                                    www.digitalindiaeducation.co.in
+                                </p>
+                                <p className='text-white text-center text-[13px] font-medium tracking-wider m-0 p-0'>
+                                    REGISTERED UNDER GOVERNMENT OF INDIA
+                                </p>
                             </div>
                         </div>
+
                     </div>
 
                     {/* Back Side */}
-                    <div className="border-[1px] border-gray-600 w-[420px] h-[265px] rounded-lg shadow-xl bg-white relative overflow-hidden mt-4">
-                        <div className="bg-gradient-to-r from-blue-500 to-red-500 text-white text-center py-2 font-semibold text-[12px] leading-tight">
+                    <div className="border-[1px] border-gray-600 w-[440px] h-[280px] rounded-lg shadow-xl bg-white relative overflow-hidden mt-4">
+                        <div className="bg-gradient-to-r from-blue-500 to-red-500 text-white text-center pb-3 font-semibold text-[12px] leading-tight">
                             <p className="text-[15px] tracking-wide ">DIGITAL INDIA EDUCATION & DIGITAL INDIA MEDIA</p>
                             <p className="text-[10px]">REGISTERED UNDER GOVERNMENT OF INDIA REGISTRATION NO GJ 01 0200853</p>
                         </div>
 
                         <div className="px-4 text-[10px] leading-tight mb-1">
-                            <p className="font-bold underline text-[15px] text-center text-red-600">
+                            <p className="font-bold underline mb-3 text-[15px] text-center text-red-600">
                                 Declaration
                             </p>
-                            <ul className="list-disc pl-5 font-semibold text-[11px] mb-2">
+                            <ul className="list-disc pl-5 font-semibold text-[11px] mb-3">
                                 <li>This Card is issued for the Identification of the Member & must be produced on demand.</li>
                                 <li>The Card Holder is authorized to book advertisements from all over India for the website & promote the website throughout India.</li>
                                 <li>This Card Is Not A Reporter Card.</li>
@@ -163,7 +185,7 @@ const CardGenerator = () => {
                         </div>
 
                         {/* Footer */}
-                        <div className="bg-gradient-to-r from-blue-500 to-red-500 text-white text-center text-[12px] font-semibold leading-tight pb-2">
+                        <div className="bg-gradient-to-r from-blue-500 to-red-500 text-white text-center text-[12px] font-semibold leading-tight pb-3">
                             <p>Corporate Office: E-112, Siddhi Appartment, Near Madhuvan Society, Ghodasar, Ahmedabad - 380050</p>
                             <p>www.digitalindiaeducation.co.in</p>
                         </div>
