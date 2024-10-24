@@ -7,42 +7,48 @@ const CardGenerator = () => {
         name: '',
         designation: '',
         userMobile: '',
-        profilePhoto: '',
+        profilePhoto: '',   
+        phoneNumber: '',
+        issueDate: '',
+        expireDate: '',
     });
 
+    const [isDownloading, setIsDownloading] = useState(false);
+
     useEffect(() => {
-        const fetchUserProfile = async () => {
-            try {
-                const response = await fetch('YOUR_API_ENDPOINT'); // Update this with your API endpoint
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const data = await response.json();
+        // Fetching user profile from session storage
+        const fetchUserProfile = () => {
+            const storedUserProfile = JSON.parse(sessionStorage.getItem('userProfile'));
+            if (storedUserProfile) {
+                const issueDate = new Date(storedUserProfile.registrationDate);  // Assuming registrationDate is stored in session
+                const expireDate = new Date(issueDate);
+                expireDate.setFullYear(issueDate.getFullYear() + 1);  // Set expiry date 1 year later
+
                 setUserProfile({
-                    name: data.name,
-                    designation: data.designation,
-                    userMobile: data.userMobile,
-                    profilePhoto: data.profilePhoto,
+                    name: storedUserProfile.name,
+                    designation: storedUserProfile.designation,
+                    userMobile: storedUserProfile.userMobile,
+                    profilePhoto: storedUserProfile.profilePhoto,
+                    phoneNumber: storedUserProfile.phoneNumber,
+                    issueDate: issueDate.toLocaleDateString(),  // Format the date
+                    expireDate: expireDate.toLocaleDateString(),
                 });
-            } catch (error) {
-                console.error('Error fetching user profile:', error);
             }
         };
         fetchUserProfile();
     }, []);
 
     const downloadPDF = async () => {
+        setIsDownloading(true);
         const capture = document.getElementById('IDCARD');
     
-        // Check if the capture element is valid
         if (!capture) {
             console.error('Capture element not found');
             return;
         }
     
-        // Use html2canvas to capture the ID card
         const canvas = await html2canvas(capture, {
-            scale: 2, // Increase scale for better quality
+            scale: 2,
             scrollX: 0,
             scrollY: 0,
             useCORS: true,
@@ -55,40 +61,33 @@ const CardGenerator = () => {
     
         const pageWidth = doc.internal.pageSize.getWidth();
         const pageHeight = doc.internal.pageSize.getHeight();
-    
-        // Get the image width and height based on page width (for scaling)
         const imgWidth = pageWidth;
         const imgHeight = (canvas.height * pageWidth) / canvas.width;
+        const topMargin = 10;
     
-        // Set a top margin (adjust as needed)
-        const topMargin = 10; // 10 mm space from the top
-    
-        // Ensure image fits on the page
         if (imgHeight > pageHeight - topMargin) {
-            // If the image is taller than the page (considering the margin), fill the page from the top
             doc.addImage(imgData, 'PNG', 0, topMargin, pageWidth, pageHeight - topMargin);
         } else {
-            // Otherwise, place the image at the top with margin
             doc.addImage(imgData, 'PNG', 0, topMargin, imgWidth, imgHeight);
         }
-    
-        // Save the PDF
+
         doc.save('Card.pdf');
+
+        setTimeout(() => {
+            setIsDownloading(false);  // Reset button state after download is complete
+        }, 1000);
     };
-    
-    
-    
 
     return (
         <div>
             <div id='IDCARD' className='w-full flex justify-center gap-10'>
                 <div className="flex flex-col items-center">
                     {/* Front Side */}
-                    <div className="border-[1px] border-gray-600 w-[440px] h-[280px] rounded-lg shadow-xl bg-white relative overflow-hidden">
+                    <div className="border-[1px] border-gray-600 w-[450px] h-[300px] rounded-lg shadow-xl bg-white relative overflow-hidden">
                         {/* Header */}
                         <div className="flex items-center">
                             <img
-                                src="/Photos/Logo.jpg"  // Make sure the image paths are correct
+                                src="/Photos/Logo.jpg"
                                 alt="Logo"
                                 className="pl-2 w-30 h-20 object-fill"
                             />
@@ -102,19 +101,19 @@ const CardGenerator = () => {
                                 </h2>
                             </div>
                         </div>
-
                         {/* Photo and Info Section */}
-                        <div className='px-2 mt-2'>
-                            <p className="text-[13px] text-red-500 text-center font-bold ">IDENTITY CARD</p>
+                        <div className='px-2'>
+                            <p className="text-[13px] text-red-500 text-center font-bold ">
+                                IDENTITY CARD
+                            </p>
                             <div className="flex">
-                                <div className='mt-[-15px]'>
+                                <div className='mt-2'>
                                     <img
-                                        src={userProfile.profilePhoto || '/Photos/PersonIcon.jpg'}  // Ensure correct image paths
+                                        src={userProfile.profilePhoto || '/Photos/PersonIcon.jpg'}
                                         alt="Profile"
                                         className="w-20 h-15 border-[1px] border-gray-500"
                                     />
                                 </div>
-
                                 <div className="ml-4 text-[12px] font-semibold leading-snug flex-grow">
                                     <p>
                                         <span className="font-bold">NAME: </span>
@@ -132,25 +131,31 @@ const CardGenerator = () => {
                                         <span className="font-bold">WORKING AREA: </span>
                                         <span className="font-normal">ALL INDIA</span>
                                     </p>
+                                    <p>
+                                        <span className="font-bold">ISSUE DATE: </span>
+                                        <span className="font-normal">{userProfile.issueDate || 'Loading...'}</span>
+                                    </p>
+                                    <p>
+                                        <span className="font-bold">EXPIRE DATE: </span>
+                                        <span className="font-normal">{userProfile.expireDate || 'Loading...'}</span>
+                                    </p>
                                 </div>
-
                                 {/* QR Code Section */}
-                                <div className="ml-4">
+                                <div className="ml-4 mt-3">
                                     <img
-                                        src="/Photos/QR.jpg"  // Update this image path
+                                        src="/Photos/QR.jpg"
                                         alt="QR Code"
                                         className="w-16 h-16"
                                     />
                                 </div>
                             </div>
                         </div>
-
                         {/* Footer */}
                         <div>
                             <p className='mt-2 pb-2 bg-blue-700 text-white text-center text-[12px] font-bold m-0 p-0'>
                                 सबका साथ, सबका विकास
                             </p>
-                            <div className='bg-red-600 pb-4 pt-0'>
+                            <div className='bg-red-600 pb-3 pt-0'>
                                 <p className='text-white text-center text-[13px] font-medium tracking-wider m-0 p-0'>
                                     www.digitalindiaeducation.co.in
                                 </p>
@@ -159,21 +164,18 @@ const CardGenerator = () => {
                                 </p>
                             </div>
                         </div>
-
                     </div>
-
                     {/* Back Side */}
-                    <div className="border-[1px] border-gray-600 w-[440px] h-[280px] rounded-lg shadow-xl bg-white relative overflow-hidden mt-4">
+                    <div className="border-[1px] border-gray-600 w-[450px] h-[300px] rounded-lg shadow-xl bg-white relative overflow-hidden mt-4">
                         <div className="bg-gradient-to-r from-blue-500 to-red-500 text-white text-center pb-3 font-semibold text-[12px] leading-tight">
-                            <p className="text-[15px] tracking-wide ">DIGITAL INDIA EDUCATION & DIGITAL INDIA MEDIA</p>
-                            <p className="text-[10px]">REGISTERED UNDER GOVERNMENT OF INDIA REGISTRATION NO GJ 01 0200853</p>
+                            <p className="text-[16px] tracking-wide ">DIGITAL INDIA EDUCATION & DIGITAL INDIA MEDIA</p>
+                            <p className="text-[11px]">REGISTERED UNDER GOVERNMENT OF INDIA REGISTRATION NO {userProfile.phoneNumber || 'Loading...'}</p>
                         </div>
-
                         <div className="px-4 text-[10px] leading-tight mb-1">
                             <p className="font-bold underline mb-3 text-[15px] text-center text-red-600">
                                 Declaration
                             </p>
-                            <ul className="list-disc pl-5 font-semibold text-[11px] mb-3">
+                            <ul className="list-disc pl-5 font-semibold text-[12px] mb-3">
                                 <li>This Card is issued for the Identification of the Member & must be produced on demand.</li>
                                 <li>The Card Holder is authorized to book advertisements from all over India for the website & promote the website throughout India.</li>
                                 <li>This Card Is Not A Reporter Card.</li>
@@ -183,25 +185,25 @@ const CardGenerator = () => {
                                 <li>After Expire validity of card, the member must renew the card.</li>
                             </ul>
                         </div>
-
                         {/* Footer */}
-                        <div className="bg-gradient-to-r from-blue-500 to-red-500 text-white text-center text-[12px] font-semibold leading-tight pb-3">
-                            <p>Corporate Office: E-112, Siddhi Appartment, Near Madhuvan Society, Ghodasar, Ahmedabad - 380050</p>
-                            <p>www.digitalindiaeducation.co.in</p>
+                        <div className="bg-gradient-to-r from-blue-500 to-red-500 leading-tight pb-3">
+                            <p className='text-white text-center text-[13px] font-semibold' >Corporate Office: E-112, Siddhi Appartment, Near Madhuvan Society, Ghodasar, Ahmedabad - 380050</p>
+                            <p className='text-white text-center text-[13px] font-semibold' >www.digitalindiaeducation.co.in</p>
                         </div>
                     </div>
                 </div>
             </div>
-
             <div className='w-full flex items-center justify-center mt-5'>
-                <button className='bg-[#1f2937] hover:bg-[#1f2937e2] text-white py-2 px-4 rounded-xl'
+                <button
+                    type="submit"
+                    className={`bg-[#1f2937] hover:bg-[#1f2937e2] w-32 rounded text-white p-2 ${isDownloading ? 'bg-[#1f2937] hover:bg-[#1f2937e2]' : 'hover:bg-[#1f2937e2]'}`}
                     onClick={downloadPDF}
+                    disabled={isDownloading}
                 >
-                    Download Card
+                    {isDownloading ? "Downloading..." : "Download Card"}
                 </button>
             </div>
         </div>
     );
 };
-
 export default CardGenerator;

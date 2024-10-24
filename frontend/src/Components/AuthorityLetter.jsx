@@ -2,12 +2,6 @@ import React from 'react';
 
 const Authority = () => {
   const images = [
-    '/Photos/Letters/Amit-Kumar-Letter.jpg', // Replace with your image paths
-    '/Photos/Letters/HileshBhai-Letter.jpg',
-    '/Photos/Letters/Javed-Bhai-Letter.jpg',
-    '/Photos/Letters/NarayanBhai-Letter.jpg',
-    '/Photos/Letters/PrakashBhai-Letter.jpg',
-    '/Photos/Letters/RajeshBhai-Letter.jpg',
     '/Photos/kit.png',
     '/Photos/IdCard.jpg',
     '/Photos/QR.jpg',
@@ -17,7 +11,7 @@ const Authority = () => {
     <div className="max-w-7xl mx-auto p-6">
       {/* Heading */}
       <h1 className="text-4xl font-bold text-gray-600 text-left mb-8">
-        Authority Letters
+        Kits
       </h1>
 
       {/* Images Grid */}
