@@ -26,12 +26,29 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ message: 'Invalid email or password' });
     }
 
-    // Create session and store user data
+    // Store all user data in session (except the password)
     req.session.user = {
       id: user._id,
-      email: user.email,
       firstName: user.firstName,
-      lastName: user.lastName
+      lastName: user.lastName,
+      email: user.email,
+      streetAddress: user.streetAddress,
+      town: user.town,
+      state: user.state,
+      pincode: user.pincode,
+      phone: user.phone,
+      nomineeName: user.nomineeName,
+      sponsorId: user.sponsorId,
+      vigilanceOfficer: user.vigilanceOfficer,
+      accountUsername: user.accountUsername,
+      userImage: user.userImage,
+      aadharFront: user.aadharFront,
+      aadharBack: user.aadharBack,
+      panCard: user.panCard,
+      bankPassbook: user.bankPassbook,
+      paymentScreenshot: user.paymentScreenshot,
+      registrationDate: user.registrationDate,
+      role: user.role,
     };
 
     console.log('Session data:', req.session.user); // Check if session is working

@@ -1,6 +1,14 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
 
 const JoinNow = () => {
+  const navigate = useNavigate(); // Initialize useNavigate
+
+  // Function to handle adding to cart
+  const handleAddToCart = () => {
+    navigate('/register'); // Navigate to the Registration page
+  };
+
   return (
     <>
       <h2 className="text-start text-3xl font-bold mt-8 pl-10 text-gray-600">JOIN NOW</h2>
@@ -19,7 +27,10 @@ const JoinNow = () => {
           </div>
           <div className='flex flex-col items-center mt-4'>
             <a href="" className="text-black hover:underline mb-2">Add Review</a>
-            <button className="bg-[#1f2937] text-white py-2 px-4 rounded-full hover:bg-[#1f2937e2] transition duration-300">
+            <button 
+              onClick={handleAddToCart} // Attach the click handler
+              className="bg-[#1f2937] text-white py-2 px-4 rounded-full hover:bg-[#1f2937e2] transition duration-300"
+            >
               Add to Cart
             </button>
           </div>

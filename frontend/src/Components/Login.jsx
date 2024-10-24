@@ -26,7 +26,6 @@ const Login = ({ prop }) => {
 
     try {
       const response = await fetch('http://localhost:3001/api/login', {
-        
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -54,6 +53,13 @@ const Login = ({ prop }) => {
     }
   };
 
+  // Handle key press for Enter key
+  const handleKeyPress = (event) => {
+    if (event.key === 'Enter') {
+      handleLogin(); // Call handleLogin on Enter key press
+    }
+  };
+
   return (
     <div className="flex items-center justify-center min-h-fit pt-20 pb-10">
       <div className="bg-white p-8 shadow-all rounded w-full max-w-md">
@@ -70,6 +76,7 @@ const Login = ({ prop }) => {
             className="w-full outline-none"
             value={email} // Set value to email
             onChange={(e) => setEmail(e.target.value)} // Update state for email
+            onKeyPress={handleKeyPress} // Handle Enter key press
             disabled={loading} // Disable inputs while loading
           />
         </div>
@@ -83,6 +90,7 @@ const Login = ({ prop }) => {
             className="w-full outline-none"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            onKeyPress={handleKeyPress} // Handle Enter key press
             disabled={loading} // Disable inputs while loading
           />
           <button onClick={togglePasswordVisibility} className="focus:outline-none">
