@@ -115,7 +115,7 @@ const CardGenerator = () => {
                                         className="w-20 h-15 border-[1px] border-gray-500"
                                     />
                                 </div>
-                                <div className="ml-4 text-[12px] font-semibold leading-snug flex-grow">
+                                <div className="ml-4 text-[12px]  leading-snug flex-grow uppercase font-bold">
                                     <p>
                                         <span className="font-bold">NAME: </span>
                                         <span className="font-normal">{userProfile.firstName || 'Loading...'} {userProfile.lastName || 'loading...'}</span>

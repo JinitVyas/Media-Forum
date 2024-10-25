@@ -1,79 +1,57 @@
 import { useState } from 'react';
-import { FaHome, FaUser, FaDollarSign, FaLock, FaChevronDown, FaChevronUp } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom'; // Assuming you're using react-router for navigation
+import { FaHome, FaDollarSign, FaChevronDown, FaChevronUp, FaRupeeSign } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom'; 
+import Withdraw from './Withdraw'; 
 
-const MyAccountSideBar = () => {
-    const [isProfileOpen, setProfileOpen] = useState(false);
+const MyAccountSideBar = ({setActiveComponent }) => {
     const [isMarketingOpen, setMarketingOpen] = useState(false);
-    const [isReportsOpen, setReportsOpen] = useState(false);
-    const [loading, setLoading] = useState(false); // To show loading state during logout
-    const [error, setError] = useState(''); // To show any errors during logout
-    const navigate = useNavigate(); // For navigation after logout
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
 
-    const toggleProfile = () => setProfileOpen(!isProfileOpen);
+    const navigate = useNavigate();
+
     const toggleMarketing = () => setMarketingOpen(!isMarketingOpen);
-    const toggleReports = () => setReportsOpen(!isReportsOpen);
 
     // Handle Logout Function
     const handleLogout = async () => {
-        setLoading(true); // Start loading state
-        setError(''); // Reset any previous errors
+        setLoading(true);
+        setError('');
 
         try {
-            const response = await fetch('http://localhost:3001/api/logout', {  // Ensure this points to your backend
+            const response = await fetch('http://localhost:3001/api/logout', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                credentials: 'include' // Ensures cookies are sent along with the request
+                credentials: 'include'
             });
-    
-            if (response.ok) {
-                // Clear localStorage or sessionStorage if you are using them
-                localStorage.removeItem('token'); // Remove token if stored locally
 
-                // On successful logout, redirect to login page or home page
-                navigate('/login'); // Assuming you have a login page route set up
+            if (response.ok) {
+                localStorage.removeItem('token');
+                navigate('/login');
             } else {
-                setError('Failed to log out'); // Show error message if logout fails
+                setError('Failed to log out');
             }
         } catch (error) {
-            setError('Error logging out. Please try again.'); // Handle fetch/network errors
+            setError('Error logging out. Please try again.');
             console.error('Error logging out:', error);
         } finally {
-            setLoading(false); // Stop loading state
+            setLoading(false);
         }
     };
 
     return (
         <div className="w-80 h-full bg-[#1f2937] text-white p-4">
             {/* Dashboard */}
-            <div className="px-4 py-2 hover:bg-blue-500 cursor-pointer flex items-center">
+            <div className="px-4 py-2 hover:bg-blue-500 cursor-pointer flex items-center" onClick={() => setActiveComponent('dashboard')}>
                 <FaHome className="mr-2" />
                 <span>Dashboard</span>
             </div>
 
             {/* Profile Dropdown */}
-            <div className="flex items-center justify-between px-4 py-2 hover:bg-blue-500 cursor-pointer" onClick={toggleProfile}>
-                <span>Profile</span>
-                {isProfileOpen ? <FaChevronUp /> : <FaChevronDown />}
+            <div className="flex items-center justify-between px-4 py-2 hover:bg-blue-500 cursor-pointer" onClick={() => setActiveComponent('changePassword')}>
+                <span>Change Password</span>
             </div>
-            {isProfileOpen && (
-                <div className="pl-6">
-                    <div className="py-1 hover:bg-blue-500 cursor-pointer flex items-center">
-                        <FaUser className="mr-2" />
-                        <span>Edit Your Account</span>
-                    </div>
-                    <div className="py-1 hover:bg-blue-500 cursor-pointer flex items-center">
-                        <FaLock className="mr-2" />
-                        <span>Change Your Password</span>
-                    </div>
-                    <div className="py-1 hover:bg-blue-500 cursor-pointer flex items-center">
-                        <FaDollarSign className="mr-2" />
-                        <span>Payout Details</span>
-                    </div>
-                </div>
-            )}
 
             {/* Marketing Dropdown */}
             <div className="flex items-center justify-between px-4 py-2 hover:bg-blue-500 cursor-pointer" onClick={toggleMarketing}>
@@ -86,29 +64,25 @@ const MyAccountSideBar = () => {
                 </div>
             )}
 
-            {/* Payments */}
-            <div className="px-4 py-2 hover:bg-blue-500 cursor-pointer flex items-center">
-                <FaDollarSign className="mr-2" />
-                <span>Payments</span>
+            {/* Withdraw Button */}
+            <div
+                className="px-4 py-2 hover:bg-blue-500 cursor-pointer flex items-center"
+                onClick={() => setActiveComponent('withdraw')}
+            >
+                <FaRupeeSign className="mr-2" />
+                <span>Withdraw</span>
             </div>
 
             {/* Reports Dropdown */}
-            <div className="flex items-center justify-between px-4 py-2 hover:bg-blue-500 cursor-pointer" onClick={toggleReports}>
-                <span>Reports</span>
-                {isReportsOpen ? <FaChevronUp /> : <FaChevronDown />}
+            <div className="flex items-center justify-between px-4 py-2 hover:bg-blue-500 cursor-pointer" onClick={() => setActiveComponent('team')}>
+                <span>My Team</span>
             </div>
-            {isReportsOpen && (
-                <div className="pl-6">
-                    <div className="py-1 hover:bg-blue-500 cursor-pointer">Reports</div>
-                    <div className="py-1 hover:bg-blue-500 cursor-pointer">My Team</div>
-                </div>
-            )}
 
             {/* Log Out */}
             <div
                 className={`px-4 py-2 hover:bg-blue-500 cursor-pointer flex items-center ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                 onClick={handleLogout}
-                disabled={loading} // Disable interaction when logging out
+                disabled={loading}
             >
                 <span>Log Out</span>
             </div>

@@ -22,6 +22,8 @@ const User = require('./models/User');
 require('dotenv').config(); // Load environment variables
 const authMiddleware = require('./middleware/authMiddleware');
 const sessionRoute = require('./routes/session'); // Adjust path as necessary
+const approvedRoute = require('./routes/approved');
+const rejectRoute = require('./routes/rejectRoute.js');
 
 
 const app = express();
@@ -84,9 +86,24 @@ app.use('/api/users', require('./routes/userManagement.js'));
 app.use('/api/register', require('./routes/registration'));
 app.use('/api/logout', logout);
 app.use('/api/users_email', userEmailRoute);
+app.use('/api/approve', approvedRoute);
+app.use('/api/reject', rejectRoute);
 
+// Assuming you're using Express and Mongoose
+app.get('/api/users/pending', async (req, res) => {
+  try {
+      const pendingUsers = await User.find({
+          $or: [{ status: 'Pending' }, { status: { $exists: false } }]
+      });
+      res.status(200).json(pendingUsers);
+  } catch (error) {
+      console.error('Error fetching pending users:', error);
+      res.status(500).send('Server error');
+  }
+});
 
 app.use('/api/session', sessionRoute);
+
 router.get('/protected-route', authMiddleware, (req, res) => {
   res.json({ message: 'This is a protected route', user: req.session });
 });

@@ -344,10 +344,10 @@ const RegisterPage = () => {
 
                         {/* Sponsor ID */}
                         <div>
-                            <label className="block mb-1 font-semibold text-start">Sponsor ID <span className='text-red-500'>*</span></label>
+                            <label className="block mb-1 font-semibold text-start">Sponsor ID</label>
                             <input
                                 type="text"
-                                {...register('sponsorId', { required: 'Sponsor ID is required' })}
+                                {...register('sponsorId')}
                                 placeholder="Enter Sponsor ID"
                                 className="w-full border border-gray-300 p-2 focus:outline-none focus:border-black"
                             />

@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import AdminNavbar from '../Components/AdminNavbar';
 import AdminUsers from '../Components/AdminUsers';
+import AdminPendingRegistration from '../Components/AdminPendingRegistration';
 
 const AdminPage = () => {
   const [users, setUsers] = useState([]);
@@ -11,9 +12,10 @@ const AdminPage = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/api/users'); // Ensure this is the correct URL
-        console.log('Fetched Users:', response.data); // Log the fetched data
+        const response = await axios.get('http://localhost:3001/api/users/'); // Ensure this is the correct URL
         setUsers(response.data);
+        console.log(response);
+        
       } catch (error) {
         console.error('Error fetching user data:', error); // Log the error if it occurs
       }
@@ -31,6 +33,7 @@ const AdminPage = () => {
       <Routes>
         {/* Redirect from /admin to /admin/users */}
         <Route path="/" element={<Navigate to="users" />} />
+        <Route path="pendingRegistration" element={<AdminPendingRegistration to="pendingRegistration" />} />
         
         {/* Pass users as a prop to AdminUsers */}
         <Route path="users" element={<AdminUsers users={users} />} />

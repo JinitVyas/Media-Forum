@@ -5,7 +5,7 @@ const IntroBanner = () => {
     <>
         <div className='flex w-full bg-[#1f2937] pt-5'>
             <div className='w-[15%] flex justify-center m-3 ml-10'>
-                <img src="/Photos/Logo.png" alt="Logo" loading='lazy'
+                <img src="/Photos/Logo.jpg" alt="Logo" loading='lazy'
                 className='w-full object-contain'/>
             </div>
             <div className='p-3 mr-14'>

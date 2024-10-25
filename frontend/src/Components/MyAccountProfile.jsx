@@ -42,7 +42,7 @@ const MyAccountProfile = () => {
     
     <div className="flex items-center justify-center bg-gray-100">
       
-      <div className="bg-white shadow-lg p-6 w-full max-w-6xl flex">
+      <div className="bg-white shadow-lg p-6 w-full flex">
         {/* Left Side: Profile Picture and Name */}
         <div className="flex items-center">
           <img
@@ -51,7 +51,7 @@ const MyAccountProfile = () => {
             className="rounded-full w-24 h-24 mr-6"
           />
           <div>
-            <h1 className="text-2xl font-bold text-gray-800">{userData.firstName} {userData.lastName}</h1>
+            <h1 className="text-[25px] font-bold text-gray-800 uppercase">{userData.firstName} {userData.lastName}</h1>
             <p className="text-gray-500 mt-1">Congratulations! Welcome to our family</p>
             <span className="inline-block mt-2 bg-green-500 text-white px-3 py-1 rounded-full text-sm">
               Member

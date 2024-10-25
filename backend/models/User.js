@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema({
   phone: { type: String, required: true },
   email: { type: String, required: true, unique: true, lowercase: true }, 
   nomineeName: { type: String, required: true },
-  sponsorId: { type: String, required: true },
+  sponsorId: { type: String, required: false },
   vigilanceOfficer: { type: String, required: true },
   accountUsername: { type: String, required: true },
   password: { type: String, required: true },
@@ -28,6 +28,10 @@ const userSchema = new mongoose.Schema({
     default: 'user',
     required: true 
 },
+status: { type: String, default: 'Pending' }, // default status
+lastWithdrawal: { type: String, required: false},
+currentBalance: { type: Number, default : 0},
+
 });
 
 // Create a User model

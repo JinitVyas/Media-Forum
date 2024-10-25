@@ -1,7 +1,7 @@
 const AdminUsers = ({ users, darkMode }) => {
     return (
       <div>
-        <h1 className="text-2xl font-bold mb-4">User Management</h1>
+        <h1 className="text-3xl font-bold mb-4 m-2">User Management</h1>
         <div className="overflow-x-auto">
           <table className={`min-w-full border-collapse ${darkMode ? 'border-gray-700' : 'border-gray-300'}`}>
             <thead>
