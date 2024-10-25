@@ -1,8 +1,47 @@
-
+import React, { useState, useEffect } from 'react';
+import axios from 'axios'; // For making HTTP requests
 
 const MyAccountProfile = () => {
+  const [userData, setUserData] = useState(null);
+
+  useEffect(() => {
+    const email = localStorage.getItem('userEmail'); // Retrieve email from localStorage
+    if (!email) {
+      console.error('No email found in localStorage');
+      return;
+    }
+    else{
+      console.log(email);
+    }
+
+    const fetchUserData = async () => {
+      console.log("yoo")
+      try {
+        // Make an API call to get user data by email
+        const response = await axios.get(`http://localhost:3001/api/users_email?email=${email}`);
+        // console.log(response.data)
+        if (response.data) {
+          setUserData(response.data); // Store user data in state
+        } else {
+          console.error('No user data found');
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  if (!userData) {
+    return <div>Loading...</div>; // Show loading indicator until data is fetched
+  }
+  
+
   return (
+    
     <div className="flex items-center justify-center bg-gray-100">
+      
       <div className="bg-white shadow-lg p-6 w-full max-w-6xl flex">
         {/* Left Side: Profile Picture and Name */}
         <div className="flex items-center">
@@ -12,8 +51,8 @@ const MyAccountProfile = () => {
             className="rounded-full w-24 h-24 mr-6"
           />
           <div>
-            <h1 className="text-2xl font-bold text-gray-800">TRIPATHI AVADHKISHOR</h1>
-            <p className="text-gray-500 mt-1">Congratulation Welcome to our Family</p>
+            <h1 className="text-2xl font-bold text-gray-800">{userData.firstName} {userData.lastName}</h1>
+            <p className="text-gray-500 mt-1">Congratulations! Welcome to our family</p>
             <span className="inline-block mt-2 bg-green-500 text-white px-3 py-1 rounded-full text-sm">
               Member
             </span>

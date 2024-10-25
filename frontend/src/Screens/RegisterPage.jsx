@@ -115,7 +115,6 @@ const RegisterPage = () => {
             });
             console.log("Response from server:", response);
 
-
             if (!response.ok) {
                 throw new Error('Failed to register');
             }

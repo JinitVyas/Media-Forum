@@ -3,11 +3,14 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const session = require('express-session');
+const protectedRouter = require('./routes/protectedRoute');
+
 const MongoStore = require('connect-mongo');
 const mongoose = require('mongoose');
 const connectDB = require('./config/db');
 const userRoutes = require('./routes/userRoutes');
 const loginRoute = require('./routes/login');
+const userEmailRoute = require('./routes/userEmailRoute');
 const logout = require('./routes/logout.js');
 const multer = require('multer'); // For handling file uploads
 const storage = multer.memoryStorage();
@@ -15,9 +18,15 @@ const upload = multer({ storage });
 const sharp = require('sharp'); // For image conversion
 const fs = require('fs');
 const path = require('path');
+const User = require('./models/User');
 require('dotenv').config(); // Load environment variables
+const authMiddleware = require('./middleware/authMiddleware');
+const sessionRoute = require('./routes/session'); // Adjust path as necessary
+
 
 const app = express();
+
+const router = express.Router();
 
 // Ensure important environment variables are loaded
 if (!process.env.JWT_SECRET || !process.env.SESSION_SECRET || !process.env.MONGO_URI) {
@@ -40,7 +49,7 @@ connectDB()
 app.use(helmet());
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD'],
   credentials: true,
 }));
 app.use(morgan('dev'));
@@ -74,7 +83,13 @@ app.use('/api/login', loginRoute);
 app.use('/api/users', require('./routes/userManagement.js'));
 app.use('/api/register', require('./routes/registration'));
 app.use('/api/logout', logout);
+app.use('/api/users_email', userEmailRoute);
 
+
+app.use('/api/session', sessionRoute);
+router.get('/protected-route', authMiddleware, (req, res) => {
+  res.json({ message: 'This is a protected route', user: req.session });
+});
 // Serve static files from the public/uploads folder
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 app.post('/upload', upload.single('image'), async (req, res) => {

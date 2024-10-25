@@ -7,7 +7,7 @@ const router = express.Router();
 // Configure Multer for file uploads (make sure the directory exists)
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/'); // Ensure this directory exists
+    cb(null, '../frontend/uploads/'); // Ensure this directory exists
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -58,7 +58,6 @@ router.post('/', upload.fields([
       return res.status(400).json({ message: 'Invalid email format.' });
     }
 
-
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: 'User already exists.' });
@@ -66,12 +65,12 @@ router.post('/', upload.fields([
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const userImage = req.files['userImage'] ? req.files['userImage'][0].path : null;
-    const aadharFront = req.files['aadharFront'] ? req.files['aadharFront'][0].path : null;
-    const aadharBack = req.files['aadharBack'] ? req.files['aadharBack'][0].path : null;
-    const panCard = req.files['panCard'] ? req.files['panCard'][0].path : null;
-    const bankPassbook = req.files['bankPassbook'] ? req.files['bankPassbook'][0].path : null;
-    const paymentScreenshot = req.files['paymentScreenshot'] ? req.files['paymentScreenshot'][0].path : null;
+    const userImage = req.files['userImage'] ? req.files['userImage'][0].filename : null;
+    const aadharFront = req.files['aadharFront'] ? req.files['aadharFront'][0].filename : null;
+    const aadharBack = req.files['aadharBack'] ? req.files['aadharBack'][0].filename : null;
+    const panCard = req.files['panCard'] ? req.files['panCard'][0].filename : null;
+    const bankPassbook = req.files['bankPassbook'] ? req.files['bankPassbook'][0].filename : null;
+    const paymentScreenshot = req.files['paymentScreenshot'] ? req.files['paymentScreenshot'][0].filename : null;
 
     const newUser = new User({
       firstName,

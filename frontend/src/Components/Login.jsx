@@ -4,6 +4,8 @@ import { FaUser, FaLock } from 'react-icons/fa'; // Icons for User and Password
 import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai'; // Eye icons
 import { Link } from 'react-router-dom';
 import '../app.css';
+import Cookies from 'js-cookie'; // Import js-cookie
+
 
 const Login = ({ prop }) => {
   const [email, setEmail] = useState(''); // Changed state from username to email
@@ -40,6 +42,8 @@ const Login = ({ prop }) => {
 
       if (response.ok) {
         // Successful login
+        localStorage.setItem('userEmail', email);
+
         navigate('/accountPage'); // Navigate to My Account page
       } else {
         // Display error message from backend

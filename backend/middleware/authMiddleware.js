@@ -1,29 +1,15 @@
-const jwt = require('jsonwebtoken');
+// middleware/authMiddleware.js
+const session = require('express-session');
 
-const auth = (req, res, next) => {
-  // Get the token from the Authorization header
-  const token = req.header('Authorization');
-
-  // Check if the token exists
-  if (!token) {
-    return res.status(401).json({ message: 'No token, authorization denied' });
+const authMiddleware = (req, res, next) => {
+  // Check if the session exists and has a user object
+  if (req.session && req.session.user) {
+    // User is authenticated, proceed to the next middleware or route handler
+    return next();
   }
 
-  try {
-    // If token starts with 'Bearer ', remove it
-    const actualToken = token.startsWith('Bearer ') ? token.slice(7, token.length).trimLeft() : token;
-
-    // Verify the token using the JWT secret
-    const decoded = jwt.verify(actualToken, process.env.JWT_SECRET);
-
-    // Attach the decoded user info to the request object for further usage in routes
-    req.user = decoded.user; // Assuming the JWT payload contains `user`
-
-    next(); // Move to the next middleware or route handler
-  } catch (err) {
-    console.error('Token validation failed:', err);
-    res.status(401).json({ message: 'Invalid token' });
-  }
+  // User is not authenticated, return an unauthorized response
+  return res.status(401).json({ message: 'Unauthorized: No session found' });
 };
 
-module.exports = auth;
+module.exports = authMiddleware;

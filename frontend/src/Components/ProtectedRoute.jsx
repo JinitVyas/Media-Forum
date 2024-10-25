@@ -1,16 +1,16 @@
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 
 // ProtectedRoute checks if the user has a valid token before granting access to a route
 const ProtectedRoute = ({ children }) => {
-  // Check if a token exists in localStorage or sessionStorage
-  const token = localStorage.getItem('token'); // You can also use sessionStorage
+  const token = localStorage.getItem('token'); // Check for token in localStorage
+  const location = useLocation();
 
-  // If no token, redirect to the login page
+  // Redirect to login if not authenticated and trying to access protected routes
   if (!token) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // If a token exists, allow access to the protected route
+  // If token exists, allow access to the protected route
   return children;
 };
 

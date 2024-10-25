@@ -53,8 +53,22 @@ router.post('/', async (req, res) => {
 
     console.log('Session data:', req.session.user); // Check if session is working
 
-    // Respond with success message
-    res.status(200).json({ message: 'Login successful' });
+    // Save session and set the session ID cookie
+    req.session.save((err) => {
+      if (err) {
+        return res.status(500).json({ message: 'Error creating session' });
+      }
+
+      // Set the session cookie
+      res.cookie('connect.sid', req.sessionID, {
+        httpOnly: true,  // Makes the cookie inaccessible to JavaScript
+        secure: process.env.NODE_ENV === 'production',  // Use HTTPS in production
+        maxAge: 24 * 60 * 60 * 1000,  // 1 day expiration
+      });
+
+      // Respond with success message
+      res.status(200).json({ message: 'Login successful', sessionId: req.session.id });
+    });
   } catch (err) {
     console.error('Error during login:', err.message);
     res.status(500).send('Server error');
