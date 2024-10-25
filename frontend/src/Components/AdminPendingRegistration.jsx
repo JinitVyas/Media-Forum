@@ -56,9 +56,7 @@ const AdminPendingRegistration = () => {
             try {
                 const response = await fetch('http://localhost:3001/api/users/pending');
                 const data = await response.json();
-                console.log(data);
                 setUsers(data);
-                console.log(data);
                 
             } catch (error) {
                 console.error('Error fetching user data:', error);
@@ -78,10 +76,11 @@ const AdminPendingRegistration = () => {
                     },
                     body: JSON.stringify({ email }),
                 });
-
+                
                 if (response.ok) {
+                    console.log(response);
                     alert(`${email}'s registration approved!`);
-                    window.location.reload();
+                    // window.location.reload();
                 } else {
                     alert('Failed to approve registration.');
                 }
@@ -105,7 +104,7 @@ const AdminPendingRegistration = () => {
 
                 if (response.ok) {
                     alert(`${email}'s registration rejected!`);
-                    window.location.reload();
+                    // window.location.reload();
                 } else {
                     alert('Failed to reject registration.');
                 }

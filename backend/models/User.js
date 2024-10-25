@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema({
   phone: { type: String, required: true },
   email: { type: String, required: true, unique: true, lowercase: true }, 
   nomineeName: { type: String, required: true },
-  sponsorId: { type: String, required: false },
+  sponsorId: { type: String, required: false, default: "9509416349"},
   vigilanceOfficer: { type: String, required: true },
   accountUsername: { type: String, required: true },
   password: { type: String, required: true },
@@ -27,11 +27,11 @@ const userSchema = new mongoose.Schema({
     enum: ['user', 'admin'], 
     default: 'user',
     required: true 
-},
-status: { type: String, default: 'Pending' }, // default status
-lastWithdrawal: { type: String, required: false},
-currentBalance: { type: Number, default : 0},
-
+  },
+  status: { type: String, default: 'Pending' },
+  lastWithdrawal: { type: String, required: false},
+  currentBalance: { type: Number, default : 0},
+  referredBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
 });
 
 // Create a User model

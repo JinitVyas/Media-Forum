@@ -14,7 +14,7 @@ const AdminPage = () => {
       try {
         const response = await axios.get('http://localhost:3001/api/users/'); // Ensure this is the correct URL
         setUsers(response.data);
-        console.log(response);
+        // console.log(response);
         
       } catch (error) {
         console.error('Error fetching user data:', error); // Log the error if it occurs

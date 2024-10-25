@@ -1,66 +1,92 @@
-
 const express = require('express');
+const mongoose = require('mongoose');
 const router = express.Router();
+const User = require('../models/User'); // Adjust path if needed
 
 router.post('/', async (req, res) => {
-    const { email } = req.body;
-    console.log(`Approval request received for email: ${email}`);
-  
+    const { email, sponsorId } = req.body;
+    console.log("LODO MARO",req.body)
+
+    const newUser = await User.findOne({email:email})
+
+    // Start a session for the transaction
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
     try {
-      // Find the user to approve
-      const approvedUser = await User.findOneAndUpdate(
-        { email: email },
-        { status: 'Approved' },
-        { new: true }
-      );
-  
-      if (approvedUser) {
-        const referredUserId = approvedUser._id; // Approved user's ID
-        const referrerId = approvedUser.referredBy[0]; // Assuming the first ID is the direct referrer
-  
-        // Find the referrer user to get their referredBy list
-        const referrerUser = await User.findById(referrerId);
-        if (!referrerUser) {
-          return res.status(404).send(`Referrer user not found`);
+        // Step 1: Check if sponsorId exists and find the sponsor user
+        let sponsorUser;
+
+        if (newUser.sponsorId) {
+            sponsorUser = await User.findOne({ phone: newUser.sponsorId }).session(session);
         }
-  
-        // Append the newly approved user's ID to the end of the referrer's referredBy list
-        const updatedReferredByList = [...referrerUser.referredBy, referredUserId];
-  
-        // Update the referrer with the new referredBy list
-        await User.findByIdAndUpdate(
-          referrerId,
-          { referredBy: updatedReferredByList }, // Update referredBy list
-          { new: true }
-        );
-  
-        // Update balances: Direct referrer gets 500, indirect referrers get 20
-        await User.findByIdAndUpdate(
-          referrerId,
-          { $inc: { balance: 500 } }, // Increment by 500 for the direct referrer
-          { new: true }
-        );
-  
-        // Update balances for indirect referrers (up to 19 levels)
-        for (let i = 1; i < Math.min(referrerUser.referredBy.length, 20); i++) {
-          const indirectReferrerId = referrerUser.referredBy[i];
-  
-          // Update balance for indirect referrer
-          await User.findByIdAndUpdate(
-            indirectReferrerId,
-            { $inc: { balance: 20 } }, // Increment by 20 for each indirect referrer
-            { new: true }
-          );
+
+        // If no sponsorUser is found, assign the default sponsorId
+        if (!sponsorUser) {
+            // const sponsorIdDefault = phone; // Set to default
+            sponsorUser = await User.findOne({ phone: newUser.sponsorId }).session(session);
         }
-  
+
+        // If no sponsorUser is still found, handle accordingly
+        if (!sponsorUser) {
+            // await session.abortTransaction();
+            // session.endSession();
+            console.log(`Sponsor with ID ${newUser.sponsorId} not found.`);
+        }
+
+        // Step 2: Create a new referral chain based on sponsor's referredBy list
+        let newReferralChain;
+        if (sponsorUser.referredBy.length === 0) {
+            // Initialize with sponsor's ID if there are no entries
+            newReferralChain = [sponsorUser.phone]; // Assuming phone numbers are stored as strings
+        } else if (sponsorUser.referredBy.length < 21) {
+            // Add sponsor's ID to the end if list has fewer than 21 entries
+            newReferralChain = [...sponsorUser.referredBy, sponsorUser.phone];
+        } else {
+            // If list has 21 entries, remove the first and add sponsor's ID to the end
+            newReferralChain = [...sponsorUser.referredBy.slice(1), sponsorUser.phone];
+        }
+
+        // Step 3: Create the new approved user with the referral chain
+        const approvedUser = await User.findOneAndUpdate(
+            { email: email },
+            {
+                ...req.body,
+                referredBy: newReferralChain,
+                status: 'Approved'
+            },
+            { new: true, session }
+        );
+
+        // Step 4: Update direct sponsor's balance by 500
+        await User.findByIdAndUpdate(
+            sponsorUser._id,
+            { $inc: { currentBalance: 500 } },
+            { new: true, session }
+        );
+
+        // Step 5: Update balances for each indirect referrer (20 per indirect referrer in the chain)
+        for (let i = 0; i < newReferralChain.length - 1; i++) {
+            const indirectReferrerPhone = newReferralChain[i]; // Assuming phone numbers are stored as strings
+            await User.findOneAndUpdate(
+                { phone: indirectReferrerPhone },
+                { $inc: { currentBalance: 20 } },
+                // { new: true, session }
+            );
+        }
+
+        // Commit the transaction if all updates succeed
+        await session.commitTransaction();
+        session.endSession();
+
         res.status(200).send(`Approval successful for ${email}`);
-      } else {
-        res.status(404).send(`User with email ${email} not found`);
-      }
     } catch (error) {
-      console.error('Error approving user:', error);
-      res.status(500).send('Error approving user');
+        // Rollback transaction on error
+        await session.abortTransaction();
+        session.endSession();
+        console.error('Error during user approval:', error);
+        res.status(500).send('Error approving user. Changes rolled back.');
     }
-  });
-  
-  module.exports = router;
+});
+
+module.exports = router;
