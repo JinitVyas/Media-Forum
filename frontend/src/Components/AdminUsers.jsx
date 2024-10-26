@@ -15,7 +15,7 @@ const AdminUsers = ({ users, darkMode }) => {
                 <th className="border border-gray-300 p-2">Phone</th>
                 <th className="border border-gray-300 p-2">Email</th>
                 <th className="border border-gray-300 p-2">Nominee Name</th>
-                <th className="border border-gray-300 p-2">Sponsor ID</th>
+                <th className="border border-gray-300 p-2">Current Balance</th>
                 <th className="border border-gray-300 p-2">Vigilance Officer</th>
                 <th className="border border-gray-300 p-2">Account Username</th>
               </tr>
@@ -32,7 +32,7 @@ const AdminUsers = ({ users, darkMode }) => {
                   <td className="border border-gray-300 p-2">{user.phone}</td>
                   <td className="border border-gray-300 p-2">{user.email}</td>
                   <td className="border border-gray-300 p-2">{user.nomineeName}</td>
-                  <td className="border border-gray-300 p-2">{user.sponsorId}</td>
+                  <td className="border border-gray-300 p-2">{user.currentBalance}</td>
                   <td className="border border-gray-300 p-2">{user.vigilanceOfficer}</td>
                   <td className="border border-gray-300 p-2">{user.accountUsername}</td>
                 </tr>

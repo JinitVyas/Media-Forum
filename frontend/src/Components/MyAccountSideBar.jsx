@@ -13,25 +13,18 @@ const MyAccountSideBar = ({setActiveComponent }) => {
     const toggleMarketing = () => setMarketingOpen(!isMarketingOpen);
 
     // Handle Logout Function
-    const handleLogout = async () => {
+    // Handle Logout Function
+    const handleLogout = () => {
         setLoading(true);
         setError('');
 
         try {
-            const response = await fetch('http://localhost:3001/api/logout', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                credentials: 'include'
-            });
+            // Remove 'userEmail' and any other necessary local storage items
+            localStorage.removeItem('userEmail'); // Remove userEmail
+            localStorage.removeItem('token');     // Remove token if needed
 
-            if (response.ok) {
-                localStorage.removeItem('token');
-                navigate('/login');
-            } else {
-                setError('Failed to log out');
-            }
+            // Redirect to login page
+            navigate('/login');
         } catch (error) {
             setError('Error logging out. Please try again.');
             console.error('Error logging out:', error);
@@ -39,6 +32,7 @@ const MyAccountSideBar = ({setActiveComponent }) => {
             setLoading(false);
         }
     };
+
 
     return (
         <div className="w-80 h-full bg-[#1f2937] text-white p-4">

@@ -37,21 +37,20 @@ router.post('/', upload.fields([
       phone,
       email,
       nomineeName,
-      sponsorId,
+      referPhoneNumber, // Use referPhoneNumber for the referrer phone number
       vigilanceOfficer,
       accountUsername,
       password,
       registrationDate
     } = req.body;
-    // console.log("Received files:", req.files);
+
     console.log("Received body data:", req.body);
 
-
-
+    // Required field validation
     if (!firstName || !lastName || !email || !password || !registrationDate) {
       return res.status(400).json({ message: 'Please fill in all required fields.' });
     }
-    
+
     // Check email format (basic validation)
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
@@ -72,6 +71,7 @@ router.post('/', upload.fields([
     const bankPassbook = req.files['bankPassbook'] ? req.files['bankPassbook'][0].filename : null;
     const paymentScreenshot = req.files['paymentScreenshot'] ? req.files['paymentScreenshot'][0].filename : null;
 
+    // Save new user with the refer phone number
     const newUser = new User({
       firstName,
       lastName,
@@ -82,7 +82,7 @@ router.post('/', upload.fields([
       phone,
       email,
       nomineeName,
-      sponsorId,
+      referPhoneNumber: referPhoneNumber || null, // Store referPhoneNumber here
       vigilanceOfficer,
       accountUsername,
       password: hashedPassword,

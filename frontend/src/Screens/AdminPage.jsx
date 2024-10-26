@@ -4,6 +4,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import AdminNavbar from '../Components/AdminNavbar';
 import AdminUsers from '../Components/AdminUsers';
 import AdminPendingRegistration from '../Components/AdminPendingRegistration';
+import AdminWithdrawalRequest from '../Components/AdminWithdrawalRequest';
 
 const AdminPage = () => {
   const [users, setUsers] = useState([]);
@@ -34,6 +35,7 @@ const AdminPage = () => {
         {/* Redirect from /admin to /admin/users */}
         <Route path="/" element={<Navigate to="users" />} />
         <Route path="pendingRegistration" element={<AdminPendingRegistration to="pendingRegistration" />} />
+        <Route path="withdrawalRequests" element={<AdminWithdrawalRequest to="withdrawalRequests" />} />
         
         {/* Pass users as a prop to AdminUsers */}
         <Route path="users" element={<AdminUsers users={users} />} />

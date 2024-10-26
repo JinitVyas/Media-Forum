@@ -94,7 +94,7 @@ const RegisterPage = () => {
         formData.append('pincode', data.pincode);
         formData.append('phone', data.phone);
         formData.append('nomineeName', data.nomineeName);
-        formData.append('sponsorId', data.sponsorId);
+        formData.append('referPhoneNumber', data.referPhoneNumber); // Change here to referPhoneNumber
         formData.append('vigilanceOfficer', "Tahsil Officer");
         formData.append('accountUsername', data.accountUsername);
         formData.append('registrationDate', new Date().toISOString());
@@ -105,7 +105,6 @@ const RegisterPage = () => {
         formData.append('aadharBack', aadharBack);
         formData.append('panCard', pan);
         formData.append('bankPassbook', bankPassbook);
-        console.log(bankPassbook);
         formData.append('paymentScreenshot', paymentScreenshot);
 
         try {
@@ -347,12 +346,13 @@ const RegisterPage = () => {
                             <label className="block mb-1 font-semibold text-start">Sponsor ID</label>
                             <input
                                 type="text"
-                                {...register('sponsorId')}
+                                {...register('referPhoneNumber')} // Change here to referPhoneNumber
                                 placeholder="Enter Sponsor ID"
                                 className="w-full border border-gray-300 p-2 focus:outline-none focus:border-black"
                             />
-                            {errors.sponsorID && <p className="text-red-500">{errors.sponsorID.message}</p>}
+                            {errors.referPhoneNumber && <p className="text-red-500">{errors.referPhoneNumber.message}</p>} {/* Change here to referPhoneNumber */}
                         </div>
+
 
                         {/* Username */}
                         <div>

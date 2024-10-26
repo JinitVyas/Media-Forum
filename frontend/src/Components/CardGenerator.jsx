@@ -107,12 +107,12 @@ const CardGenerator = () => {
                                 IDENTITY CARD
                             </p>
                             <div className="flex">
-                                <div className='mt-2'>
+                                <div className=''>
                                     
                                     <img
                                         src={`../../uploads/${userProfile.userImage}` ? `../../uploads/${userProfile.userImage}` : '/Photos/PersonIcon.jpg'}
                                         alt="Profile"
-                                        className="w-20 h-15 border-[1px] border-gray-500"
+                                        className="w-20 border-[1px] h-[100px] object-fill border-gray-500"
                                     />
                                 </div>
                                 <div className="ml-4 text-[12px]  leading-snug flex-grow uppercase font-bold">

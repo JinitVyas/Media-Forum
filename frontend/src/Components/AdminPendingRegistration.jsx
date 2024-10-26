@@ -138,11 +138,11 @@ const AdminPendingRegistration = () => {
     return (
         <div className="container mx-auto p-6">
             <h1 className="text-2xl font-bold mb-6">Pending Registration</h1>
-            <div className="bg-white shadow-md rounded-lg overflow-x-auto">
+            <div className="bg-white shadow-md overflow-x-auto">
                 <table className="min-w-full border-collapse">
                     <thead>
-                        <tr className="bg-gray-200">
-                            <th className="border px-4 py-2 text-left">First Name</th>
+                        <tr className="bg-gray-200 text-nowrap">
+                            <th className="border  px-4 py-2 text-left">First Name</th>
                             <th className="border px-4 py-2 text-left">Last Name</th>
                             <th className="border px-4 py-2 text-left">Street Address</th>
                             <th className="border px-4 py-2 text-left">Town</th>
@@ -161,7 +161,7 @@ const AdminPendingRegistration = () => {
                             <th className="border px-4 py-2 text-left">PAN Card</th>
                             <th className="border px-4 py-2 text-left">Bank Passbook</th>
                             <th className="border px-4 py-2 text-left">Payment Screenshot</th>
-                            <th className="border px-4 pl-2 text-left sticky right-0 bg-gray-200">Actions</th>
+                            <th className="border px-4 pl-2 text-leftbg-gray-200">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -228,18 +228,18 @@ const AdminPendingRegistration = () => {
                                         onClick={() => openModal(`../../uploads/${user.paymentScreenshot}`)}
                                     />
                                 </td>
-                                <td className="border px-4 py-2 sticky right-0 bg-white">
+                                <td className="border px-2 py-4 bg-white flex gap-2 w-64">
                                     <button
                                         onClick={() => handleApproval(user.email)}
-                                        className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 mr-2"
+                                        className="bg-green-500 text-white px-2 py-3 rounded hover:bg-green-600 mr-2"
                                     >
-                                        <FaCheckCircle /> Approve
+                                        <span className='flex items-center justify-center gap-1'><FaCheckCircle /> Approve</span>
                                     </button>
                                     <button
                                         onClick={() => handleRejection(user.email)}
-                                        className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
+                                        className="bg-red-500 text-white px-2 py-3 w-28 rounded hover:bg-red-600"
                                     >
-                                        <FaTimesCircle /> Reject
+                                        <span className='flex items-center justify-center gap-1'><FaTimesCircle /> Reject</span>
                                     </button>
                                 </td>
                             </tr>
@@ -271,7 +271,7 @@ const AdminPendingRegistration = () => {
                             position: 'relative',
                             width: '100%',
                             height: '100%', // Adjust as necessary
-                            overflow: 'hidden',
+                            overflow: 'scroll',
                         }}
                     >
                         <img
