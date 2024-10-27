@@ -78,7 +78,6 @@ const AdminPendingRegistration = () => {
                 });
                 
                 if (response.ok) {
-                    console.log(response);
                     alert(`${email}'s registration approved!`);
                     // window.location.reload();
                 } else {

@@ -3,7 +3,6 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const session = require('express-session');
-const protectedRouter = require('./routes/protectedRoute');
 
 const MongoStore = require('connect-mongo');
 const mongoose = require('mongoose');
@@ -24,7 +23,6 @@ const authMiddleware = require('./middleware/authMiddleware');
 const sessionRoute = require('./routes/session'); // Adjust path as necessary
 const approvedRoute = require('./routes/approved');
 const rejectRoute = require('./routes/rejectRoute.js');
-const protectedRoute = require('./routes/protectedRoute.js');
 
 
 const app = express();
@@ -83,7 +81,6 @@ app.use(session({
 // Routes
 app.use('/api/auth', userRoutes);
 app.use('/api/login', loginRoute); // Login route
-app.use('/api/protected', authMiddleware, protectedRoute); // Protect this route
 
 
 app.use('/api/users', require('./routes/userManagement.js'));

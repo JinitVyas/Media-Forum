@@ -64,7 +64,6 @@ const RegisterPage = () => {
             } else if (field === 'bankPassbook') {
                 setbankPassbook(file)  // Handling new field
             }
-            console.log(`${field} selected:`, file);
             // Simulate upload progress for demo purposes
             const uploadInterval = setInterval(() => {
                 setUploadProgress((prev) => {
@@ -112,7 +111,6 @@ const RegisterPage = () => {
                 method: 'POST',
                 body: formData,  // Send as FormData object
             });
-            console.log("Response from server:", response);
 
             if (!response.ok) {
                 throw new Error('Failed to register');
@@ -122,7 +120,6 @@ const RegisterPage = () => {
             setSubmitMessage('Registration successful!');
             reset();  // Reset the form after successful registration
             localStorage.setItem('isRegistered', 'true');
-            console.log("Form data submitted:", data);
             navigate('/login');
         } catch (error) {
             console.error('Error:', error);

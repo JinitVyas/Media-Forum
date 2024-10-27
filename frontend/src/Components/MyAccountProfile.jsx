@@ -7,19 +7,16 @@ const MyAccountProfile = () => {
   useEffect(() => {
     const email = localStorage.getItem('userEmail'); // Retrieve email from localStorage
     if (!email) {
-      console.error('No email found in localStorage');
+      // console.error('No email found in localStorage');
       return;
     }
     else{
-      console.log(email);
     }
 
     const fetchUserData = async () => {
-      console.log("yoo")
       try {
         // Make an API call to get user data by email
         const response = await axios.get(`http://localhost:3001/api/users_email?email=${email}`);
-        // console.log(response.data)
         if (response.data) {
           setUserData(response.data); // Store user data in state
         } else {

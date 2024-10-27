@@ -32,14 +32,12 @@ const UploadImage = () => {
     useEffect(() => {
         // Retrieve the token from localStorage or sessionStorage
         const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-        console.log('Retrieved token:', token); // Debug log
         if (token) {
             setSessionData({ token });
         } else {
             setSessionData(null);
         }
     }, []);
-    console.log();
     return (
         <div>
             <input type="file" accept="image/*" onChange={handleFileChange} />

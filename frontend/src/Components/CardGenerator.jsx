@@ -16,18 +16,16 @@ const CardGenerator = () => {
         // Fetching user profile from session storage
         const email = localStorage.getItem('userEmail'); // Retrieve email from localStorage
         if (!email) {
-            console.error('No email found in localStorage');
+            // console.error('No email found in localStorage');
             return;
         }
 
         const fetchUserData = async () => {
-            console.log("Fetching user data...");
             try {
                 const response = await axios.get(`http://localhost:3001/api/users_email?email=${email}`);
                 
                 if (response.data) {
                     setUserProfile(response.data);
-                    console.log(response.data);
                 } else {
                     console.error('No user data found');
                 }
