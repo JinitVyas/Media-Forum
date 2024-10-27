@@ -1,15 +1,22 @@
 // middleware/authMiddleware.js
-const session = require('express-session');
+const jwt = require('jsonwebtoken');
+const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
 
 const authMiddleware = (req, res, next) => {
-  // Check if the session exists and has a user object
-  if (req.session && req.session.user) {
-    // User is authenticated, proceed to the next middleware or route handler
-    return next();
+  const token = req.headers.authorization?.split(' ')[1]; // Get token from "Authorization: Bearer <token>"
+
+  if (!token) {
+    return res.status(401).json({ message: 'Unauthorized: No token provided' });
   }
 
-  // User is not authenticated, return an unauthorized response
-  return res.status(401).json({ message: 'Unauthorized: No session found' });
+  try {
+    // Verify token
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.user = decoded; // Store decoded user data in req.user
+    next(); // Proceed to the next middleware or route handler
+  } catch (err) {
+    return res.status(403).json({ message: 'Forbidden: Invalid token' });
+  }
 };
 
 module.exports = authMiddleware;

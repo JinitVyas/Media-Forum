@@ -3,7 +3,7 @@ import { FaHome, FaDollarSign, FaChevronDown, FaChevronUp, FaRupeeSign } from 'r
 import { useNavigate } from 'react-router-dom'; 
 import Withdraw from './Withdraw'; 
 
-const MyAccountSideBar = ({setActiveComponent }) => {
+const MyAccountSideBar = ({ setActiveComponent }) => {
     const [isMarketingOpen, setMarketingOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -13,15 +13,23 @@ const MyAccountSideBar = ({setActiveComponent }) => {
     const toggleMarketing = () => setMarketingOpen(!isMarketingOpen);
 
     // Handle Logout Function
-    // Handle Logout Function
-    const handleLogout = () => {
+    const handleLogout = async () => {
         setLoading(true);
         setError('');
 
         try {
+            // Optional: Call the logout API if your backend requires it
+            await fetch('http://localhost:3001/api/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
             // Remove 'userEmail' and any other necessary local storage items
-            localStorage.removeItem('userEmail'); // Remove userEmail
-            localStorage.removeItem('token');     // Remove token if needed
+            localStorage.removeItem('authToken'); // Remove token if needed
+
+
 
             // Redirect to login page
             navigate('/login');
@@ -32,7 +40,6 @@ const MyAccountSideBar = ({setActiveComponent }) => {
             setLoading(false);
         }
     };
-
 
     return (
         <div className="w-80 h-full bg-[#1f2937] text-white p-4">
@@ -76,9 +83,8 @@ const MyAccountSideBar = ({setActiveComponent }) => {
             <div
                 className={`px-4 py-2 hover:bg-blue-500 cursor-pointer flex items-center ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                 onClick={handleLogout}
-                disabled={loading}
             >
-                <span>Log Out</span>
+                <span>{loading ? 'Logging out...' : 'Log Out'}</span>
             </div>
 
             {/* Show error message if logout fails */}

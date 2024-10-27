@@ -25,7 +25,7 @@ router.post('/', async (req, res) => {
 
         // Fallback to a default referrer if no direct referrer is found
         if (!directReferrer) {
-            directReferrer = await User.findOne({ phone: "9509416349" }).session(session);
+            directReferrer = await User.findOne({ phone: "9999999999" }).session(session);
         }
 
         // Create a new referral chain based on direct referrer’s chain

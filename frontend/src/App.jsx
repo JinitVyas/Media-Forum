@@ -34,7 +34,9 @@ function App() {
         <Route
           path="/accountPage"
           element={
+            <ProtectedRoute>
               <AccountPage />
+            </ProtectedRoute>
           }
         />
         <Route

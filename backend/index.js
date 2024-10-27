@@ -24,6 +24,7 @@ const authMiddleware = require('./middleware/authMiddleware');
 const sessionRoute = require('./routes/session'); // Adjust path as necessary
 const approvedRoute = require('./routes/approved');
 const rejectRoute = require('./routes/rejectRoute.js');
+const protectedRoute = require('./routes/protectedRoute.js');
 
 
 const app = express();
@@ -81,7 +82,10 @@ app.use(session({
 
 // Routes
 app.use('/api/auth', userRoutes);
-app.use('/api/login', loginRoute);
+app.use('/api/login', loginRoute); // Login route
+app.use('/api/protected', authMiddleware, protectedRoute); // Protect this route
+
+
 app.use('/api/users', require('./routes/userManagement.js'));
 app.use('/api/register', require('./routes/registration'));
 app.use('/api/logout', logout);

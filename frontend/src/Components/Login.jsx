@@ -1,30 +1,26 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // For navigation
-import { FaUser, FaLock } from 'react-icons/fa'; // Icons for User and Password
-import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai'; // Eye icons
+import { useNavigate } from 'react-router-dom';
+import { FaUser, FaLock } from 'react-icons/fa';
+import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
 import { Link } from 'react-router-dom';
 import '../app.css';
-import Cookies from 'js-cookie'; // Import js-cookie
-
 
 const Login = ({ prop }) => {
-  const [email, setEmail] = useState(''); // Changed state from username to email
-  const [password, setPassword] = useState(''); // State for password
-  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
-  const [error, setError] = useState(''); // State to display login errors
-  const [loading, setLoading] = useState(false); // State for loading indicator
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const navigate = useNavigate(); // React Router navigation hook
+  const navigate = useNavigate();
 
-  // Toggle password visibility
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
 
-  // Handle login
   const handleLogin = async () => {
     setLoading(true);
-    setError(''); // Clear any previous errors
+    setError('');
 
     try {
       const response = await fetch('http://localhost:3001/api/login', {
@@ -33,7 +29,7 @@ const Login = ({ prop }) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          email, // Sending email instead of username
+          email,
           password,
         }),
       });
@@ -41,26 +37,23 @@ const Login = ({ prop }) => {
       const data = await response.json();
 
       if (response.ok) {
-        // Successful login
-        localStorage.setItem('userEmail', email);
+        // Store JWT token in localStorage
+        localStorage.setItem('authToken', data.token); // Save token securely
 
-        navigate('/accountPage'); // Navigate to My Account page
+        navigate('/accountPage');
       } else {
-        // Display error message from backend
         setError(data.message || 'Invalid email or password.');
       }
     } catch (error) {
-      // Handle network errors or other issues
       setError('An error occurred. Please try again later.');
     } finally {
-      setLoading(false); // Turn off the loading state
+      setLoading(false);
     }
   };
 
-  // Handle key press for Enter key
   const handleKeyPress = (event) => {
     if (event.key === 'Enter') {
-      handleLogin(); // Call handleLogin on Enter key press
+      handleLogin();
     }
   };
 
@@ -75,13 +68,13 @@ const Login = ({ prop }) => {
         <div className="flex items-center border border-gray-300 rounded mb-4 p-2">
           <FaUser className="text-gray-500 mr-3" />
           <input
-            type="email" // Changed input type to email
-            placeholder="Enter Email" // Updated placeholder to Enter Email
+            type="email"
+            placeholder="Enter Email"
             className="w-full outline-none"
-            value={email} // Set value to email
-            onChange={(e) => setEmail(e.target.value)} // Update state for email
-            onKeyPress={handleKeyPress} // Handle Enter key press
-            disabled={loading} // Disable inputs while loading
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            onKeyPress={handleKeyPress}
+            disabled={loading}
           />
         </div>
 
@@ -94,8 +87,8 @@ const Login = ({ prop }) => {
             className="w-full outline-none"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            onKeyPress={handleKeyPress} // Handle Enter key press
-            disabled={loading} // Disable inputs while loading
+            onKeyPress={handleKeyPress}
+            disabled={loading}
           />
           <button onClick={togglePasswordVisibility} className="focus:outline-none">
             {showPassword ? (
@@ -106,21 +99,18 @@ const Login = ({ prop }) => {
           </button>
         </div>
 
-        {/* Display Error Message */}
         {error && <p className="text-red-500 text-center mb-4">{error}</p>}
 
-        {/* Forgot Password Link */}
         <div className="text-right mb-4">
           <Link to="/forgotPassword" className="text-blue-500 hover:underline">
             Forgot Password?
           </Link>
         </div>
 
-        {/* Login Button */}
         <button
           onClick={handleLogin}
           className={`w-full bg-blue-500 text-white text-lg py-2 rounded hover:bg-blue-600 transition-colors ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-          disabled={loading} // Disable button while loading
+          disabled={loading}
         >
           {loading ? 'Logging in...' : 'Login'}
         </button>
