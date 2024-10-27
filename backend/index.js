@@ -7,7 +7,6 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const mongoose = require('mongoose');
 const connectDB = require('./config/db');
-const userRoutes = require('./routes/userRoutes');
 const loginRoute = require('./routes/login');
 const userEmailRoute = require('./routes/userEmailRoute');
 const logout = require('./routes/logout.js');
@@ -20,7 +19,6 @@ const path = require('path');
 const User = require('./models/User');
 require('dotenv').config(); // Load environment variables
 const authMiddleware = require('./middleware/authMiddleware');
-const sessionRoute = require('./routes/session'); // Adjust path as necessary
 const approvedRoute = require('./routes/approved');
 const rejectRoute = require('./routes/rejectRoute.js');
 
@@ -79,7 +77,6 @@ app.use(session({
 }));
 
 // Routes
-app.use('/api/auth', userRoutes);
 app.use('/api/login', loginRoute); // Login route
 
 
@@ -103,7 +100,6 @@ app.get('/api/users/pending', async (req, res) => {
   }
 });
 
-app.use('/api/session', sessionRoute);
 
 router.get('/protected-route', authMiddleware, (req, res) => {
   res.json({ message: 'This is a protected route', user: req.session });

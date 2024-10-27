@@ -166,16 +166,18 @@ const RegisterPage = () => {
 
                         {/* Date of Birth */}
                         <div>
-                            <label className="block mb-1 font-semibold text-start">Date of Birth <span className='text-red-500'>*</span></label>
+                            <label className="block mb-1 font-semibold text-start">
+                                Date of Birth <span className='text-red-500'>*</span>
+                            </label>
                             <input
                                 type="date"
                                 {...register('dob', {
                                     required: 'Date of Birth is required',
                                     validate: (value) => {
                                         const isValidDate = !isNaN(new Date(value).getTime()); // Check if the date is valid
-                                        return isValidDate || 'Please enter a valid date';
-                                    },
-                                    validate: (value) => {
+                                        if (!isValidDate) return 'Please enter a valid date';
+
+                                        // Check if the user is at least 18 years old
                                         return isAdult(value) || 'You must be at least 18 years old';
                                     },
                                 })}
@@ -184,6 +186,7 @@ const RegisterPage = () => {
                             />
                             {errors.dob && <p className="text-red-500">{errors.dob.message}</p>}
                         </div>
+
 
 
                         {/* Phone Number */}
