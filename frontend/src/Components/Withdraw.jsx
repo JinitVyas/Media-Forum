@@ -6,17 +6,17 @@ const Withdraw = () => {
   const [totalEarnings, setTotalEarnings] = useState(0);
   const [currentBalance, setCurrentBalance] = useState(0);
   const [withdrawAmount, setWithdrawAmount] = useState('');
+  const [paymentDetails, setPaymentDetails] = useState(''); // New state for payment details
   const [message, setMessage] = useState('');
-  const [loading, setLoading] = useState(true); // New loading state
-  const authToken = localStorage.getItem('authToken'); // Assuming the token is stored in localStorage
+  const [loading, setLoading] = useState(true);
+  const authToken = localStorage.getItem('authToken'); 
 
-  // Fetching user data from the database
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         const response = await axios.get('http://localhost:3001/api/userdata', {
           headers: {
-            Authorization: `Bearer ${authToken}` // Include auth token in headers
+            Authorization: `Bearer ${authToken}`
           }
         });
 
@@ -31,49 +31,59 @@ const Withdraw = () => {
         console.error('Error fetching user data:', error);
         setMessage('Failed to load user data.');
       } finally {
-        setLoading(false); // Set loading to false once data is fetched
+        setLoading(false);
       }
     };
 
     fetchUserData();
-  }, [authToken]); // Include authToken in dependency array
+  }, [authToken]);
 
   const handleWithdraw = async () => {
+    if (!withdrawAmount) {
+      setMessage('Please enter an amount.');
+      return;
+    }
+
+    if (!paymentDetails) {
+      setMessage('Please provide payment details.');
+      return;
+    }
+
     if (parseFloat(withdrawAmount) > currentBalance) {
       setMessage('Withdrawal amount exceeds current balance.');
-      return; // Exit the function if the check fails
+      return;
     }
 
     try {
-      setMessage('Processing withdrawal...');
-      const response = await axios.post('http://localhost:3001/api/withdraw', {
-        amount: parseFloat(withdrawAmount)
-      }, {
-        headers: {
-          Authorization: `Bearer ${authToken}`
+      setMessage('Processing withdrawal request...');
+      const response = await axios.post(
+        'http://localhost:3001/api/withdrawRequest',
+        {
+          amount: parseFloat(withdrawAmount),
+          paymentDetails: paymentDetails // Include payment details
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`
+          }
         }
-      });
-
-      console.log(response)
+      );
 
       if (response.data.success === true) {
-        setMessage('Withdrawal successful!');
-        setCurrentBalance((prevBalance) => prevBalance - parseFloat(withdrawAmount));
-        setWithdrawAmount(''); // Reset the input field
+        setMessage('Withdrawal request submitted! Payment will be processed within 48 hours.');
+        setWithdrawAmount('');
+        setPaymentDetails(''); // Clear payment details
       } else {
-        // Use the specific error message from the response
-        setMessage(response.data.message || 'Withdrawal failed. Please try again.');
+        setMessage(response.data.message || 'Request failed. Please try again.');
       }
     } catch (error) {
       console.error('Error processing withdrawal:', error);
-      // Check if the error response has a message
-      setMessage(error.response?.data?.message || 'An error occurred while processing your withdrawal.');
+      setMessage(error.response?.data?.message || 'An error occurred while processing your request.');
     }
   };
 
-
   if (loading) {
-    return <div className="text-center">Loading...</div>; // Loading state
+    return <div className="text-center">Loading...</div>;
   }
 
   return (
@@ -101,6 +111,19 @@ const Withdraw = () => {
           onChange={(e) => setWithdrawAmount(e.target.value)}
           className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-300"
           placeholder="Amount"
+        />
+      </div>
+
+      <div className="mb-6">
+        <label htmlFor="payment-details" className="block text-gray-700 mb-2">
+          Payment Details:
+        </label>
+        <textarea
+          id="payment-details"
+          value={paymentDetails}
+          onChange={(e) => setPaymentDetails(e.target.value)}
+          className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-300"
+          placeholder="Provide payment details (e.g., bank account or UPI)"
         />
       </div>
 

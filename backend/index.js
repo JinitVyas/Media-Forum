@@ -23,6 +23,9 @@ const approvedRoute = require('./routes/approved');
 const rejectRoute = require('./routes/rejectRoute');
 const userRoutes = require('./routes/userRoutes');
 const withdrawalRoutes =  require('./routes/withdrawalRoutes');
+const withdrawReject =  require('./routes/rejectWithdrawReq');
+const withdrawRequest =  require('./routes/withdrawalRequestRoutes.js');
+const changePasswordRoute = require('./routes/userPassword.js');
 
 const app = express();
 
@@ -88,7 +91,10 @@ app.use('/api/users_email', userEmailRoute);
 app.use('/api/approve', approvedRoute);
 app.use('/api/reject', rejectRoute);
 app.use('/api/userdata',userRoutes);
-app.use('/api/withdraw', withdrawalRoutes); 
+app.use('/api/withdraw', withdrawalRoutes);
+app.use('/api/rejectWithdrawReq', withdrawReject);
+app.use('/api/withdrawRequest', withdrawRequest);
+app.use('/api/change', changePasswordRoute); 
 
 app.get('/api/findusers/:id', async (req, res)=>{
   try {

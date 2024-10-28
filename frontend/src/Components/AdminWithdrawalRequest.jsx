@@ -1,39 +1,46 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
+import axios from 'axios'; // Make sure to install axios with `npm install axios`
 
 const AdminWithdrawalRequest = () => {
-    // Static data for withdrawal requests with a placeholder image URL for the bank passbook
-    const requests = [
-        {
-            username: 'john_doe',
-            name: 'John Doe',
-            email: 'john@example.com',
-            withdrawAmount: '$100',
-            passbookPhoto: 'https://via.placeholder.com/100' // Placeholder image
-        },
-        {
-            username: 'jane_smith',
-            name: 'Jane Smith',
-            email: 'jane@example.com',
-            withdrawAmount: '$200',
-            passbookPhoto: 'https://via.placeholder.com/100'
-        },
-        {
-            username: 'bob_brown',
-            name: 'Bob Brown',
-            email: 'bob@example.com',
-            withdrawAmount: '$150',
-            passbookPhoto: 'https://via.placeholder.com/100'
-        },
-    ];
+    const [requests, setRequests] = useState([]);
 
-    // Static handlers for approve and reject actions
-    const handleApprove = (email) => {
-        alert(`Approved request for ${email}`);
+    // Fetch withdrawal requests from the API
+    useEffect(() => {
+        const fetchRequests = async () => {
+            try {
+                const response = await axios.get('/api/withdrawal-requests'); // Update with your API endpoint
+                setRequests(response.data);
+            } catch (error) {
+                console.error('Error fetching withdrawal requests:', error);
+            }
+        };
+
+        fetchRequests();
+    }, []);
+
+    // Approve a withdrawal request
+    const handleApprove = async (requestId) => {
+        try {
+            await axios.post(`/api/withdrawal-requests/approve/${requestId}`); // Update with your API endpoint
+            alert(`Approved request for ${requestId}`);
+            // Optionally, refresh the requests after approval
+            setRequests((prev) => prev.filter((request) => request.id !== requestId));
+        } catch (error) {
+            console.error('Error approving request:', error);
+        }
     };
 
-    const handleReject = (email) => {
-        alert(`Rejected request for ${email}`);
+    // Reject a withdrawal request
+    const handleReject = async (requestId) => {
+        try {
+            await axios.post(`/api/withdrawal-requests/reject/${requestId}`); // Update with your API endpoint
+            alert(`Rejected request for ${requestId}`);
+            // Optionally, refresh the requests after rejection
+            setRequests((prev) => prev.filter((request) => request.id !== requestId));
+        } catch (error) {
+            console.error('Error rejecting request:', error);
+        }
     };
 
     return (
@@ -52,8 +59,8 @@ const AdminWithdrawalRequest = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {requests.map((request, index) => (
-                            <tr key={index} className="border-b">
+                        {requests.map((request) => (
+                            <tr key={request.id} className="border-b">
                                 <td className="border px-4 py-2">{request.username}</td>
                                 <td className="border px-4 py-2">{request.name}</td>
                                 <td className="border px-4 py-2">{request.email}</td>
@@ -65,15 +72,15 @@ const AdminWithdrawalRequest = () => {
                                         className="w-16 h-16 object-cover rounded"
                                     />
                                 </td>
-                                <td className="px-4 pt-6 bg-white  flex items-center justify-center">
+                                <td className="px-4 pt-6 bg-white flex items-center justify-center">
                                     <button
-                                        onClick={() => handleApprove(request.email)}
+                                        onClick={() => handleApprove(request.id)}
                                         className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 mr-2 flex items-center"
                                     >
                                         <FaCheckCircle className="mr-1" /> Approve
                                     </button>
                                     <button
-                                        onClick={() => handleReject(request.email)}
+                                        onClick={() => handleReject(request.id)}
                                         className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 flex items-center"
                                     >
                                         <FaTimesCircle className="mr-1" /> Reject

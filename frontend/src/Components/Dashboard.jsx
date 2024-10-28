@@ -1,12 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import Navbar from '../Components/Navbar';
-import Footer from '../Components/Footer';
 import MyAccountProfile from '../Components/MyAccountProfile';
-import MyAccountSideBar from '../Components/MyAccountSideBar';
 import MyAccountCard from '../Components/MyAccountCard';
-import GoToTopButton from '../Components/GoToTopButton';
-import IntroBanner from '../Components/IntroBanner';
 import CardGenerator from '../Components/CardGenerator';
 
 const Dashboard = () => {
@@ -77,9 +72,9 @@ const Dashboard = () => {
             title="Total Payout Transactions"
             bgColor="bg-blue-400"
           />
-        </div>
+        {/* </div>
 
-        <div className='flex flex-col md:flex-row md:space-x-2 mt-4'>
+        <div className='flex flex-col md:flex-row md:space-x-2 mt-4'> */}
           <MyAccountCard
             number={`${userData.totalIncome - userData.currentBalance}.00 INR`} // Assume this field exists
             title="Withdrawn Earnings"

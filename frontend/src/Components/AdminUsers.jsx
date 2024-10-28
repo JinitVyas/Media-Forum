@@ -15,7 +15,6 @@ const AdminUsers = ({ users, darkMode }) => {
             try {
               const response = await axios.get(`http://localhost:3001/api/findusers/${lastReferrerId}`); // Adjust the API endpoint as needed
               usernames[lastReferrerId] = response.data.email; // Store the username by referrer ID
-              console.log(usernames[lastReferrerId]);
             } catch (error) {
               console.error(`Error fetching referrer username for ID ${lastReferrerId}:`, error);
             }

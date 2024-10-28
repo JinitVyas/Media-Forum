@@ -139,12 +139,8 @@ const CardGenerator = () => {
                                             {userProfile.registrationDate ? formatDate(userProfile.registrationDate) : 'Loading...'}
                                         </span>
                                     </p>
-                                    <p>
-                                        <span className="font-bold">EXPIRE DATE: </span>
-                                        <span className="font-normal">
-                                            {userProfile.registrationDate ? formatDate(new Date(new Date(userProfile.registrationDate).setFullYear(new Date(userProfile.registrationDate).getFullYear() + 1)).toLocaleDateString()) : 'Loading...'}
-                                        </span>
-                                    </p>
+                                    <p><span className="font-bold">EXPIRE DATE: </span><span className="font-normal">{userProfile.registrationDate ? formatDate(new Date(new Date(userProfile.registrationDate).setFullYear(new Date(userProfile.registrationDate).getFullYear() + 1))) : 'Loading...'}</span></p>
+                                
                                 </div>
                                 {/* QR Code Section */}
                                 <div className="ml-4 mt-3">
