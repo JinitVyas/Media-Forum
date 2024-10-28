@@ -1,24 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios'; // For making HTTP requests
+import axios from 'axios';
 
 const MyAccountProfile = () => {
   const [userData, setUserData] = useState(null);
 
   useEffect(() => {
-    const email = localStorage.getItem('userEmail'); // Retrieve email from localStorage
-    if (!email) {
-      // console.error('No email found in localStorage');
-      return;
-    }
-    else{
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      return; // No token, exit early
     }
 
     const fetchUserData = async () => {
       try {
-        // Make an API call to get user data by email
-        const response = await axios.get(`http://localhost:3001/api/users_email?email=${email}`);
+        const response = await axios.get('http://localhost:3001/api/userdata', {
+          headers: {
+            Authorization: `Bearer ${token}`, 
+          },
+        });
         if (response.data) {
-          setUserData(response.data); // Store user data in state
+          setUserData(response.data.user);
         } else {
           console.error('No user data found');
         }
@@ -31,19 +31,15 @@ const MyAccountProfile = () => {
   }, []);
 
   if (!userData) {
-    return <div>Loading...</div>; // Show loading indicator until data is fetched
+    return <div>Loading...</div>;
   }
-  
 
   return (
-    
     <div className="flex items-center justify-center bg-gray-100">
-      
       <div className="bg-white shadow-lg p-6 w-full flex">
-        {/* Left Side: Profile Picture and Name */}
         <div className="flex items-center">
           <img
-            src="/Photos/Profile.jpeg" // Replace with the correct path for the profile image
+            src={`../uploads/${userData.userImage}`}
             alt="Profile"
             className="rounded-full w-24 h-24 mr-6"
           />
@@ -55,22 +51,17 @@ const MyAccountProfile = () => {
             </span>
           </div>
         </div>
-
-        {/* Right Side: Referrals, Earnings, and Rank Progress */}
         <div className="ml-auto flex flex-col justify-between">
-          {/* Referrals and Earnings */}
           <div className="flex space-x-8">
             <div className="text-center">
               <h2 className="text-gray-600 font-semibold">Referrals</h2>
-              <p className="text-2xl font-bold text-gray-800">83</p>
+              <p className="text-2xl font-bold text-gray-800">{userData.totalRefers}</p>
             </div>
             <div className="text-center">
               <h2 className="text-gray-600 font-semibold">Earnings</h2>
-              <p className="text-2xl font-bold text-gray-800">12,640.00 INR</p>
+              <p className="text-2xl font-bold text-gray-800">{userData.totalIncome}.00 INR</p>
             </div>
           </div>
-
-          {/* Rank Progress Bar */}
           <div className="mt-4">
             <p className="text-gray-500 mb-2">Until Senior Sales Officer Rank...</p>
             <div className="w-full bg-gray-300 rounded-full h-2">

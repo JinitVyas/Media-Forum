@@ -4,28 +4,33 @@ import axios from 'axios';
 import html2canvas from 'html2canvas';
 
 const CardGenerator = () => {
+    
+    const [userProfile, setUserProfile] = useState({});
+    const [isDownloading, setIsDownloading] = useState(false);
+    
     const formatDate = (date) => {
         const d = new Date(date);
         return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
-      };
-    const [userProfile, setUserProfile] = useState({});
-
-    const [isDownloading, setIsDownloading] = useState(false);
+    };
 
     useEffect(() => {
-        // Fetching user profile from session storage
-        const email = localStorage.getItem('userEmail'); // Retrieve email from localStorage
-        if (!email) {
-            // console.error('No email found in localStorage');
+        // Fetching user profile from local storage using authToken
+        const authToken = localStorage.getItem('authToken'); // Retrieve authToken from localStorage
+        if (!authToken) {
+            console.error('No authToken found in localStorage');
             return;
         }
 
         const fetchUserData = async () => {
             try {
-                const response = await axios.get(`http://localhost:3001/api/users_email?email=${email}`);
-                
+                const response = await axios.get('http://localhost:3001/api/userdata', {
+                    headers: {
+                        Authorization: `Bearer ${authToken}` // Include auth token in headers
+                    }
+                });
+
                 if (response.data) {
-                    setUserProfile(response.data);
+                    setUserProfile(response.data.user);
                 } else {
                     console.error('No user data found');
                 }
@@ -36,12 +41,14 @@ const CardGenerator = () => {
         fetchUserData();
     }, []);
 
+
     const downloadPDF = async () => {
         setIsDownloading(true);
         const capture = document.getElementById('IDCARD');
 
         if (!capture) {
             console.error('Capture element not found');
+            setIsDownloading(false);
             return;
         }
 
@@ -59,21 +66,18 @@ const CardGenerator = () => {
 
         const pageWidth = doc.internal.pageSize.getWidth();
         const pageHeight = doc.internal.pageSize.getHeight();
-        const imgWidth = pageWidth;
         const imgHeight = (canvas.height * pageWidth) / canvas.width;
         const topMargin = 10;
 
+        // Add image to the PDF
         if (imgHeight > pageHeight - topMargin) {
             doc.addImage(imgData, 'PNG', 0, topMargin, pageWidth, pageHeight - topMargin);
         } else {
-            doc.addImage(imgData, 'PNG', 0, topMargin, imgWidth, imgHeight);
+            doc.addImage(imgData, 'PNG', 0, topMargin, pageWidth, imgHeight);
         }
 
         doc.save('Card.pdf');
-
-        setTimeout(() => {
-            setIsDownloading(false);  // Reset button state after download is complete
-        }, 1000);
+        setIsDownloading(false);  // Reset button state after download is complete
     };
 
     return (
@@ -105,18 +109,17 @@ const CardGenerator = () => {
                                 IDENTITY CARD
                             </p>
                             <div className="flex">
-                                <div className=''>
-                                    
+                                <div>
                                     <img
-                                        src={`../../uploads/${userProfile.userImage}` ? `../../uploads/${userProfile.userImage}` : '/Photos/PersonIcon.jpg'}
+                                        src={userProfile.userImage ? `../../uploads/${userProfile.userImage}` : '/Photos/PersonIcon.jpg'}
                                         alt="Profile"
                                         className="w-20 border-[1px] h-[100px] object-fill border-gray-500"
                                     />
                                 </div>
-                                <div className="ml-4 text-[12px]  leading-snug flex-grow uppercase font-bold">
+                                <div className="ml-4 text-[12px] leading-snug flex-grow uppercase font-bold">
                                     <p>
                                         <span className="font-bold">NAME: </span>
-                                        <span className="font-normal">{userProfile.firstName || 'Loading...'} {userProfile.lastName || 'loading...'}</span>
+                                        <span className="font-normal">{userProfile.firstName || 'Loading...'} {userProfile.lastName || 'Loading...'}</span>
                                     </p>
                                     <p>
                                         <span className="font-bold">DESIGNATION: </span>
@@ -133,21 +136,13 @@ const CardGenerator = () => {
                                     <p>
                                         <span className="font-bold">ISSUE DATE: </span>
                                         <span className="font-normal">
-                                            {
-                                                userProfile && userProfile.registrationDate ? 
-                                                formatDate(userProfile.registrationDate) 
-                                                : 'Loading...'
-                                            }
+                                            {userProfile.registrationDate ? formatDate(userProfile.registrationDate) : 'Loading...'}
                                         </span>
                                     </p>
                                     <p>
                                         <span className="font-bold">EXPIRE DATE: </span>
                                         <span className="font-normal">
-                                            {
-                                                userProfile && userProfile.registrationDate ? 
-                                                formatDate(new Date(new Date(userProfile.registrationDate).setFullYear(new Date(userProfile.registrationDate).getFullYear() + 1)).toLocaleDateString())
-                                                : 'Loading...'
-                                            }
+                                            {userProfile.registrationDate ? formatDate(new Date(new Date(userProfile.registrationDate).setFullYear(new Date(userProfile.registrationDate).getFullYear() + 1)).toLocaleDateString()) : 'Loading...'}
                                         </span>
                                     </p>
                                 </div>
@@ -193,25 +188,27 @@ const CardGenerator = () => {
                                 <li>The Company Is Not Liable For any illegal activity of the card holder.</li>
                                 <li>If the Card is lost, the Member must lodge an FIR & inform the issuing authority.</li>
                                 <li>This Card is not valid anymore after the validity date.</li>
-                                <li>After Expire validity of card, the member must renew the card.</li>
+                                <li>After expiry of the card's validity, the member must renew the card.</li>
                             </ul>
                         </div>
                         {/* Footer */}
                         <div className="bg-gradient-to-r from-blue-500 to-red-500 leading-tight pb-3">
-                            <p className='text-white text-center text-[13px] font-semibold'>Corporate Office: E-112, Siddhi Appartment, Near Madhuvan Society, Ghodasar, Ahmedabad - 380050</p>
-                            <p className='text-white text-center text-[13px] font-semibold'>www.digitalindiaeducation.co.in</p>
+                            <p className='text-white text-center text-[13px] font-semibold'>Corporate Office: E-112, Siddhi Appartment, Near Madhuvan Society, Ghodasar, Ahmedabad - 380050, Gujarat</p>
+                            <p className='text-white text-center text-[10px] font-semibold'>Phone: +91 90991 00374</p>
+                            <p className='text-white text-center text-[10px] font-semibold'>Email: digitalindiaeducation@gmail.com</p>
+                            <p className='text-white text-center text-[10px] font-semibold'>Website: www.digitalindiaeducation.co.in</p>
                         </div>
                     </div>
                 </div>
             </div>
-            <div className='w-full flex items-center justify-center mt-5'>
+            {/* Download Button */}
+            <div className='flex justify-center'>
                 <button
-                    type="submit"
                     onClick={downloadPDF}
+                    className={`w-40 h-10 rounded-md bg-blue-600 text-white font-semibold ${isDownloading ? 'opacity-50 cursor-not-allowed' : ''}`}
                     disabled={isDownloading}
-                    className={`bg-blue-600 text-white font-bold py-2 px-4 rounded ${isDownloading ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
-                    {isDownloading ? 'Downloading...' : 'Download PDF'}
+                    {isDownloading ? 'Downloading...' : 'Download Card'}
                 </button>
             </div>
         </div>

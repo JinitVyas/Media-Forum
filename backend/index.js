@@ -20,8 +20,9 @@ const User = require('./models/User');
 require('dotenv').config(); // Load environment variables
 const authMiddleware = require('./middleware/authMiddleware');
 const approvedRoute = require('./routes/approved');
-const rejectRoute = require('./routes/rejectRoute.js');
-
+const rejectRoute = require('./routes/rejectRoute');
+const userRoutes = require('./routes/userRoutes');
+const withdrawalRoutes =  require('./routes/withdrawalRoutes');
 
 const app = express();
 
@@ -86,6 +87,21 @@ app.use('/api/logout', logout);
 app.use('/api/users_email', userEmailRoute);
 app.use('/api/approve', approvedRoute);
 app.use('/api/reject', rejectRoute);
+app.use('/api/userdata',userRoutes);
+app.use('/api/withdraw', withdrawalRoutes); 
+
+app.get('/api/findusers/:id', async (req, res)=>{
+  try {
+    const user = await User.findById(req.params.id).select('email'); // Select only the accountUsername field
+    if (!user) {
+        return res.status(404).send('User not found.');
+    }
+    res.json(user);
+} catch (error) {
+    console.error('Error fetching user:', error);
+    res.status(500).send('Server error.');
+}
+});
 
 // Assuming you're using Express and Mongoose
 app.get('/api/users/pending', async (req, res) => {
