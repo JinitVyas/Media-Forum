@@ -15,30 +15,30 @@ const handleWithdrawal = async (req, res) => {
 
         const user = await User.findById(userId);
 
-        console.log(user);
-        // Business Logic
-        if (amount < 500) {
-            return res.json({ success: false, message: 'Minimum required amount is 500 INR.' });
-        }
-
-        // New check: Ensure current balance is greater than or equal to the withdrawal amount
-        if (user.currentBalance <= amount) {
-            return res.json({ success: false, message: 'Current balance must be greater than or equal to the withdrawal amount.' });
-        }
-
         const lastWithdrawal = await WithdrawalRecord.findOne({ userId }).sort({ createdAt: -1 });
 
         if (lastWithdrawal && (Date.now() - lastWithdrawal.createdAt) < 30 * 24 * 60 * 60 * 1000) {
             return res.json({ success: false, message: 'Withdrawal can only be made once every 30 days.' });
         }
+        // New check: Ensure current balance is greater than or equal to the withdrawal amount
+        if (user.currentBalance < amount) {
+            return res.json({ success: false, message: 'Current balance must be greater than or equal to the withdrawal amount.' });
+        }
+
+        // Business Logic
+        if (amount < 500) {
+            return res.json({ success: false, message: 'Minimum required amount is 500 INR.' });
+        }
+
+
 
         // Proceed with withdrawal
-        // user.currentBalance -= amount;
-        // await user.save();
+        user.currentBalance -= amount;
+        await user.save();
 
         // Record the withdrawal
-        // const withdrawalRecord = new WithdrawalRecord({ userId, amount });
-        // await withdrawalRecord.save();
+        const withdrawalRecord = new WithdrawalRecord({ userId, amount });
+        await withdrawalRecord.save();
 
         res.json({ success: true, message: 'Withdrawal successful!' });
     } catch (error) {
