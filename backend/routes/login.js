@@ -40,7 +40,7 @@ router.post('/', async (req, res) => {
     );
 
     // Respond with the JWT token
-    res.status(200).json({ message: 'Login successful', token });
+    res.status(200).json({ message: 'Login successful', token, role:user.role});
   } catch (err) {
     console.error('Error during login:', err.message);
     res.status(500).send('Server error');

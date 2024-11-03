@@ -18,6 +18,15 @@ const submitWithdrawalRequest = async (req, res) => {
             return res.json({ success: false, message: 'You already have a pending withdrawal request.' });
         }
 
+        // Find the most recent approved withdrawal request
+        const lastWithdrawal = await WithdrawalRequest.findOne({ userId, status: 'approved' })
+            .sort({ createdAt: -1 }); // Sort by createdAt in descending order to get the latest
+
+        // Check if the last withdrawal was within the last 30 days
+        if (lastWithdrawal && (Date.now() - lastWithdrawal.createdAt) < 30 * 24 * 60 * 60 * 1000) {
+            return res.json({ success: false, message: 'Withdrawal can only be made once every 30 days.' });
+        }
+
         // Check if balance is sufficient
         if (user.currentBalance < amount) {
             return res.json({ success: false, message: 'Insufficient balance for this withdrawal.' });
@@ -35,7 +44,7 @@ const submitWithdrawalRequest = async (req, res) => {
         res.json({ success: true, message: 'Withdrawal request submitted successfully.' });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ success: false, message: 'Server error.' });
+        res.status(500).json({ success: false, message: `Server error. ${error}` });
     }
 };
 

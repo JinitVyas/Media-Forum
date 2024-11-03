@@ -30,7 +30,7 @@ const Login = ({ prop }) => {
         },
         body: JSON.stringify({
           email,
-          password,
+          password
         }),
       });
 
@@ -40,7 +40,13 @@ const Login = ({ prop }) => {
         // Store JWT token in localStorage
         localStorage.setItem('authToken', data.token); // Save token securely
 
-        navigate('/accountPage');
+        // Navigate based on role
+        // console.log(data.role);
+        if (data.role === 'admin') {
+          navigate('/admin');
+        } else {
+          navigate('/accountPage');
+        }
       } else {
         setError(data.message || 'Invalid email or password.');
       }

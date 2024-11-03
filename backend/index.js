@@ -92,10 +92,20 @@ app.use('/api/users_email', userEmailRoute);
 app.use('/api/approve', approvedRoute);
 app.use('/api/reject', rejectRoute);
 app.use('/api/userdata',userRoutes);
+
+// approve withdraw req
 app.use('/api/withdraw', withdrawalRoutes);
+
+// reject withdrawal req
 app.use('/api/rejectWithdrawReq', withdrawReject);
+
+// submit withdraw request
 app.use('/api/withdrawRequest', withdrawRequest);
+
+// Display withdraw requests
 app.use('/api/withdrawal-requests', withdrawRequestsView);
+
+
 app.use('/api/change', changePasswordRoute); 
 
 app.get('/api/findusers/:id', async (req, res)=>{

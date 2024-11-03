@@ -1,29 +1,43 @@
 // routes/withdrawRequestsView.js
 const express = require('express');
-const WithdrawalRecord = require('../models/WithdrawalRecord'); // Ensure you have this model set up for withdrawals
-const User = require('../models/User');
 const router = express.Router();
+const WithdrawalRequest = require('../models/WithdrawalRequest');
 
-// GET route to fetch all withdrawal requests
+// Route to fetch all withdrawal requests with user details
 router.get('/', async (req, res) => {
     try {
-        // Fetch all withdrawal requests
-        const withdrawalRequests = await WithdrawalRecord.find().populate('userId', 'username email name'); // Assuming userId references the User model
+        const requests = await WithdrawalRequest.aggregate([
+            {
+                $lookup: {
+                    from: 'users', // The collection name for users
+                    localField: 'userId', // Field in withdrawalrequests to match
+                    foreignField: '_id', // Field in users collection to match
+                    as: 'userDetails' // The name of the new field for joined data
+                }
+            },
+            {
+                $unwind: '$userDetails' // Flatten the userDetails array
+            },
+            {
+                $project: {
+                    _id: 1,
+                    amount: 1,
+                    status: 1,
+                    createdAt: 1,
+                    'userDetails.firstName': 1,
+                    'userDetails.lastName': 1,
+                    'userDetails.accountUsername': 1,
+                    'userDetails.email': 1,
+                    'userDetails.phone': 1,
+                    'userDetails.bankPassbook': 1
+                }
+            }
+        ]);
 
-        // Format the response to include user details and withdrawal information
-        const formattedRequests = withdrawalRequests.map(request => ({
-            id: request._id,
-            username: request.userId.username,
-            name: request.userId.name,
-            email: request.userId.email,
-            withdrawAmount: request.amount,
-            passbookPhoto: request.createdAt // Assuming there's a field for passbook photo URL
-        }));
-
-        res.json(formattedRequests);
+        res.json(requests);
     } catch (error) {
-        console.error("Error fetching withdrawal requests:", error);
-        res.status(500).json({ message: 'Server error while fetching withdrawal requests' });
+        console.error('Error fetching withdrawal requests with user details:', error);
+        res.status(500).json({ message: 'Server error while fetching withdrawal requests.' });
     }
 });
 
