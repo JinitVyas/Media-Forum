@@ -44,10 +44,10 @@ const Withdraw = () => {
       return;
     }
 
-    if (!paymentDetails) {
-      setMessage('Please provide payment details.');
-      return;
-    }
+    // if (!paymentDetails) {
+    //   setMessage('Please provide payment details.');
+    //   return;
+    // }
 
     if (parseFloat(withdrawAmount) > currentBalance) {
       setMessage('Withdrawal amount exceeds current balance.');
