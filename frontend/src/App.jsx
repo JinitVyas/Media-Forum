@@ -11,6 +11,8 @@ import LegalDocumentPage from './Screens/LegalDocumentPage';
 import NotFound from './components/NotFound';
 import UploadImage from './Components/UploadImage';
 import ProtectedRoute from './Components/ProtectedRoute';
+// import 
+import AdminProtectedRoute from './Components/adminProtectedRoutes';
 
 function App() {
   return (
@@ -26,10 +28,10 @@ function App() {
         <Route
           path="/legalDocument"
           element={
-              <LegalDocumentPage />
+            <LegalDocumentPage />
           }
         />
-        
+
         {/* Protected Routes */}
         <Route
           path="/accountPage"
@@ -42,7 +44,7 @@ function App() {
         <Route
           path="/admin/*"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute adminOnly={true}>
               <AdminPage />
             </ProtectedRoute>
           }
@@ -50,10 +52,10 @@ function App() {
         <Route
           path="/plan"
           element={
-              <PlanPage />
+            <PlanPage />
           }
         />
-        
+
 
         {/* Catch-all Route */}
         <Route path="*" element={<NotFound />} />
